@@ -729,19 +729,19 @@
 
             // Generate the trade card in a clean format
             const tradeCard = `
-═══════════════════════════════════════
+═══════════════
 ${title}
-═══════════════════════════════════════
+═══════════════
 📅 ${dateStr} • ${timeStr}
 💰 Entry Price: ${currencySymbol}${displayEntry.toFixed(2)}
 📦 Quantity: ${quantity} shares
 💵 Total Cost: ${currencySymbol}${displayInvestment.toFixed(2)}
-──────────────────────────────────────
+═══════════════
 🎯 TAKE PROFIT: ${currencySymbol}${displayTP.toFixed(2)}
    ↗️ +${tpPercent}% gain = +${currencySymbol}${displayMaxProfit.toFixed(2)}
 🛑 STOP LOSS: ${currencySymbol}${displaySL.toFixed(2)}
    ↘️ -${slPercent}% loss = -${currencySymbol}${displayMaxLoss.toFixed(2)}
-═══════════════════════════════════════
+═══════════════
 `.trim();
 
             // Copy to clipboard
