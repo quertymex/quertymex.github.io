@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -188,6 +188,19 @@
                     </div>
 
                     <form id="tradeForm" class="space-y-4">
+                        <!-- Stock Name (Optional) -->
+                        <div>
+                            <label for="stockName" class="block text-sm font-medium text-gray-300 mb-2">
+                                Stock Name <span class="text-gray-500 text-xs">(Optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="stockName"
+                                placeholder="e.g., AAPL, TSLA"
+                                class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
+                            >
+                        </div>
+
                         <!-- Entry Price -->
                         <div>
                             <label for="entryPrice" class="block text-sm font-medium text-gray-300 mb-2">Entry Price</label>
@@ -310,7 +323,7 @@
                                 <h3 class="text-sm font-semibold text-white">Quick Copy</h3>
                             </div>
                         </div>
-                        <div class="grid grid-cols-3 gap-3">
+                        <div class="grid grid-cols-3 gap-3 mb-3">
                             <button onclick="copyPrice('buy')" class="group bg-dark-bg hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-all">
                                 <div class="text-xs text-gray-400 mb-1">BUY</div>
                                 <div class="text-sm font-bold text-trading-blue" id="copyBuyPrice">0.00</div>
@@ -324,6 +337,12 @@
                                 <div class="text-sm font-bold text-trading-down" id="copySLPrice">0.00</div>
                             </button>
                         </div>
+                        <button onclick="exportTradeCard()" class="w-full bg-gradient-to-r from-trading-blue to-trading-up hover:opacity-90 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                            </svg>
+                            Export Trade Card
+                        </button>
                     </div>
                 </div>
 
@@ -643,6 +662,95 @@
             setTimeout(() => {
                 message.classList.add('hidden');
             }, 2000);
+        }
+
+        function exportTradeCard() {
+            // Check if results are available
+            const results = document.getElementById('results');
+            if (!results.classList.contains('result-active')) {
+                alert('Please calculate trade levels first before exporting.');
+                return;
+            }
+
+            // Get values from the form
+            const stockName = document.getElementById('stockName').value.trim();
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
+            const slPercent = parseFloat(document.getElementById('slPercent').value);
+
+            // Calculate values
+            const tpPrice = entryPrice * (1 + tpPercent / 100);
+            const slPrice = entryPrice * (1 - slPercent / 100);
+            const investment = entryPrice * quantity;
+            const maxProfit = (tpPrice - entryPrice) * quantity;
+            const maxLoss = (entryPrice - slPrice) * quantity;
+            const ratio = (maxProfit / maxLoss).toFixed(1);
+
+            // Get currency symbol
+            const currencySymbol = currentCurrency === 'USD' ? '$' : 'RM';
+
+            // Apply currency conversion if in MYR
+            let displayEntry, displayTP, displaySL, displayInvestment, displayMaxProfit, displayMaxLoss;
+
+            if (currentCurrency === 'MYR') {
+                displayEntry = entryPrice * USD_TO_MYR;
+                displayTP = tpPrice * USD_TO_MYR;
+                displaySL = slPrice * USD_TO_MYR;
+                displayInvestment = investment * USD_TO_MYR;
+                displayMaxProfit = maxProfit * USD_TO_MYR;
+                displayMaxLoss = maxLoss * USD_TO_MYR;
+            } else {
+                displayEntry = entryPrice;
+                displayTP = tpPrice;
+                displaySL = slPrice;
+                displayInvestment = investment;
+                displayMaxProfit = maxProfit;
+                displayMaxLoss = maxLoss;
+            }
+
+            // Determine if risk/reward is good (ratio >= 2)
+            const ratioEmoji = parseFloat(ratio) >= 2 ? '✅' : '⚠️';
+
+            // Get current date and time
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            const timeStr = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Build title with stock name if provided
+            const title = stockName ? `📊 ${stockName.toUpperCase()} TRADE SETUP` : '📊 TRADE SETUP';
+
+            // Generate the trade card in a clean format
+            const tradeCard = `
+═══════════════════════════════════════
+${title}
+═══════════════════════════════════════
+📅 ${dateStr} • ${timeStr}
+💰 Entry Price: ${currencySymbol}${displayEntry.toFixed(2)}
+📦 Quantity: ${quantity} shares
+💵 Total Cost: ${currencySymbol}${displayInvestment.toFixed(2)}
+──────────────────────────────────────
+🎯 TAKE PROFIT: ${currencySymbol}${displayTP.toFixed(2)}
+   ↗️ +${tpPercent}% gain = +${currencySymbol}${displayMaxProfit.toFixed(2)}
+🛑 STOP LOSS: ${currencySymbol}${displaySL.toFixed(2)}
+   ↘️ -${slPercent}% loss = -${currencySymbol}${displayMaxLoss.toFixed(2)}
+═══════════════════════════════════════
+`.trim();
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(tradeCard).then(() => {
+                showSuccessMessage();
+            }).catch(err => {
+                console.error('Failed to copy trade card:', err);
+                alert('Failed to copy to clipboard. Please try again.');
+            });
         }
 
         // Allow Enter key to calculate
