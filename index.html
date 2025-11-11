@@ -275,19 +275,12 @@
                             </div>
                         </div>
 
-                        <!-- Buttons -->
+                        <!-- Reset Button -->
                         <div class="flex gap-3 pt-2">
-                            <button
-                                type="button"
-                                onclick="calculateTradeLevels()"
-                                class="flex-1 bg-trading-blue hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                            >
-                                Calculate
-                            </button>
                             <button
                                 type="reset"
                                 onclick="resetCalculator()"
-                                class="px-6 bg-dark-hover hover:bg-dark-border text-gray-300 font-semibold py-3 rounded-lg transition-all border border-dark-border"
+                                class="w-full bg-dark-hover hover:bg-dark-border text-gray-300 font-semibold py-3 rounded-lg transition-all border border-dark-border"
                             >
                                 Reset
                             </button>
@@ -753,13 +746,24 @@ ${title}
             });
         }
 
-        // Allow Enter key to calculate
-        document.getElementById('tradeForm').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
+        // Auto-calculate on input change
+        function autoCalculate() {
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
+            const slPercent = parseFloat(document.getElementById('slPercent').value);
+
+            // Only auto-calculate if we have at least entry price and quantity
+            if (entryPrice && entryPrice > 0 && quantity && quantity > 0) {
                 calculateTradeLevels();
             }
-        });
+        }
+
+        // Add event listeners to all input fields
+        document.getElementById('entryPrice').addEventListener('input', autoCalculate);
+        document.getElementById('quantity').addEventListener('input', autoCalculate);
+        document.getElementById('tpPercent').addEventListener('input', autoCalculate);
+        document.getElementById('slPercent').addEventListener('input', autoCalculate);
 
         // Clear error on input
         document.querySelectorAll('input[type="number"]').forEach(input => {
