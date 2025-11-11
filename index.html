@@ -110,16 +110,6 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button
-                        id="currencyToggle"
-                        onclick="toggleCurrency()"
-                        class="flex items-center gap-2 px-4 py-2 bg-dark-card border border-dark-border rounded-lg hover:bg-dark-hover transition-all text-sm font-medium text-white"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span id="currencyLabel">USD</span>
-                    </button>
                     <div class="hidden md:flex items-center gap-2 text-xs text-gray-400">
                         <div class="flex items-center gap-1">
                             <div class="w-2 h-2 bg-trading-up rounded-full"></div>
@@ -203,10 +193,10 @@
 
                         <!-- Entry Price -->
                         <div>
-                            <label for="entryPrice" class="block text-sm font-medium text-gray-300 mb-2">Entry Price</label>
+                            <label for="entryPrice" class="block text-sm font-medium text-gray-300 mb-2">Entry Price (USD)</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-400 text-sm" id="currencySymbol">$</span>
+                                    <span class="text-gray-400 text-sm">$</span>
                                 </div>
                                 <input
                                     type="number"
@@ -296,7 +286,7 @@
                         </svg>
                         <div>
                             <p class="text-sm text-gray-300 leading-relaxed">
-                                Enter your entry price, quantity, and target percentages to calculate precise take profit and stop loss levels for your trade.
+                                Enter your entry price, quantity, and target percentages. Results will auto-calculate and display in both USD and MYR.
                             </p>
                         </div>
                     </div>
@@ -351,21 +341,33 @@
 
                         <!-- Price Levels -->
                         <div class="space-y-3 mb-5">
-                            <div class="flex items-center justify-between py-2 border-b border-dark-border">
-                                <span class="text-sm text-gray-400">Entry Price</span>
-                                <span class="text-base font-bold text-trading-blue" id="resultEntry">$0.00</span>
+                            <div class="py-2 border-b border-dark-border">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-400">Entry Price</span>
+                                    <span class="text-base font-bold text-trading-blue" id="resultEntry">$0.00</span>
+                                </div>
+                                <div class="text-right text-xs text-gray-500" id="resultEntryMYR">RM 0.00</div>
                             </div>
-                            <div class="flex items-center justify-between py-2 border-b border-dark-border">
-                                <span class="text-sm text-gray-400">Investment</span>
-                                <span class="text-base font-bold text-white" id="resultInvestment">$0.00</span>
+                            <div class="py-2 border-b border-dark-border">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-400">Investment</span>
+                                    <span class="text-base font-bold text-white" id="resultInvestment">$0.00</span>
+                                </div>
+                                <div class="text-right text-xs text-gray-500" id="resultInvestmentMYR">RM 0.00</div>
                             </div>
-                            <div class="flex items-center justify-between py-2 border-b border-dark-border">
-                                <span class="text-sm text-gray-400">Take Profit</span>
-                                <span class="text-base font-bold text-trading-up" id="resultTP">$0.00</span>
+                            <div class="py-2 border-b border-dark-border">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-400">Take Profit</span>
+                                    <span class="text-base font-bold text-trading-up" id="resultTP">$0.00</span>
+                                </div>
+                                <div class="text-right text-xs text-gray-500" id="resultTPMYR">RM 0.00</div>
                             </div>
-                            <div class="flex items-center justify-between py-2">
-                                <span class="text-sm text-gray-400">Stop Loss</span>
-                                <span class="text-base font-bold text-trading-down" id="resultSL">$0.00</span>
+                            <div class="py-2">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-sm text-gray-400">Stop Loss</span>
+                                    <span class="text-base font-bold text-trading-down" id="resultSL">$0.00</span>
+                                </div>
+                                <div class="text-right text-xs text-gray-500" id="resultSLMYR">RM 0.00</div>
                             </div>
                         </div>
 
@@ -374,11 +376,13 @@
                             <div class="bg-dark-bg rounded-lg p-4 border-l-4 border-trading-up">
                                 <div class="text-xs text-gray-400 mb-1">MAX PROFIT</div>
                                 <div class="text-xl font-bold text-trading-up" id="maxProfit">+$0.00</div>
+                                <div class="text-xs text-gray-500 mt-1" id="maxProfitMYR">+RM 0.00</div>
                                 <div class="text-xs text-gray-500 mt-2">Per Share: <span id="perShareTPDisplay">+$0.00</span></div>
                             </div>
                             <div class="bg-dark-bg rounded-lg p-4 border-l-4 border-trading-down">
                                 <div class="text-xs text-gray-400 mb-1">MAX LOSS</div>
                                 <div class="text-xl font-bold text-trading-down" id="maxLoss">-$0.00</div>
+                                <div class="text-xs text-gray-500 mt-1" id="maxLossMYR">-RM 0.00</div>
                                 <div class="text-xs text-gray-500 mt-2">Per Share: <span id="perShareSLDisplay">-$0.00</span></div>
                             </div>
                         </div>
@@ -398,7 +402,6 @@
 
     <script>
         // Currency state
-        let currentCurrency = 'USD';
         let USD_TO_MYR = 4.50; // Default fallback rate
         let isLoadingRate = false;
 
@@ -423,12 +426,10 @@
                     updateRateDisplay(`${USD_TO_MYR.toFixed(4)} MYR`);
                     console.log('Exchange rate updated:', USD_TO_MYR);
 
-                    // If currently viewing in MYR, update the conversion
-                    if (currentCurrency === 'MYR') {
-                        const results = document.getElementById('results');
-                        if (results.classList.contains('result-active')) {
-                            convertToMYR();
-                        }
+                    // If results are visible, recalculate to update MYR values
+                    const results = document.getElementById('results');
+                    if (results.classList.contains('result-active')) {
+                        autoCalculate();
                     }
                 } else {
                     throw new Error('Invalid response');
@@ -468,72 +469,7 @@
         // Fetch rate when page loads
         window.addEventListener('DOMContentLoaded', fetchExchangeRate);
 
-        function toggleCurrency() {
-            const results = document.getElementById('results');
-            const hasResults = results.classList.contains('result-active');
-
-            if (!hasResults) {
-                // Show error if no results calculated yet
-                alert('Please calculate trade levels first before converting currency.');
-                return;
-            }
-
-            if (currentCurrency === 'USD') {
-                currentCurrency = 'MYR';
-                convertToMYR();
-            } else {
-                currentCurrency = 'USD';
-                convertToUSD();
-            }
-
-            // Update button label
-            document.getElementById('currencyLabel').textContent = currentCurrency;
-            document.getElementById('currencySymbol').textContent = currentCurrency === 'USD' ? '$' : 'RM';
-        }
-
-        function convertToMYR() {
-            // Get all USD values and convert
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
-            const slPercent = parseFloat(document.getElementById('slPercent').value);
-
-            // Convert entry price
-            const entryMYR = entryPrice * USD_TO_MYR;
-            const tpPrice = entryMYR * (1 + tpPercent / 100);
-            const slPrice = entryMYR * (1 - slPercent / 100);
-            const investment = entryMYR * quantity;
-            const maxProfit = (tpPrice - entryMYR) * quantity;
-            const maxLoss = (entryMYR - slPrice) * quantity;
-            const perShareTP = tpPrice - entryMYR;
-            const perShareSL = entryMYR - slPrice;
-
-            // Update display
-            document.getElementById('resultEntry').textContent = 'RM' + entryMYR.toFixed(2);
-            document.getElementById('resultInvestment').textContent = 'RM' + investment.toFixed(2);
-            document.getElementById('resultTP').textContent = 'RM' + tpPrice.toFixed(2);
-            document.getElementById('resultSL').textContent = 'RM' + slPrice.toFixed(2);
-            document.getElementById('maxProfit').textContent = '+RM' + maxProfit.toFixed(2);
-            document.getElementById('maxLoss').textContent = '-RM' + maxLoss.toFixed(2);
-            document.getElementById('perShareTPDisplay').textContent = '+RM' + perShareTP.toFixed(2);
-            document.getElementById('perShareSLDisplay').textContent = '-RM' + perShareSL.toFixed(2);
-
-            // Update copy section
-            document.getElementById('copyBuyPrice').textContent = entryMYR.toFixed(2);
-            document.getElementById('copyTPPrice').textContent = tpPrice.toFixed(2);
-            document.getElementById('copySLPrice').textContent = slPrice.toFixed(2);
-        }
-
-        function convertToUSD() {
-            // Recalculate from original USD values
-            calculateTradeLevels();
-        }
-
         function calculateTradeLevels() {
-            // Reset to USD when calculating
-            currentCurrency = 'USD';
-            document.getElementById('currencyLabel').textContent = 'USD';
-            document.getElementById('currencySymbol').textContent = '$';
 
             // Get input values
             const entryPrice = parseFloat(document.getElementById('entryPrice').value);
@@ -597,7 +533,7 @@
             // Calculate risk/reward ratio
             const ratio = (maxProfit / maxLoss).toFixed(1);
 
-            // Update display
+            // Update display with USD values
             document.getElementById('resultEntry').textContent = '$' + entryPrice.toFixed(2);
             document.getElementById('resultInvestment').textContent = '$' + investment.toFixed(2);
             document.getElementById('resultTP').textContent = '$' + tpPrice.toFixed(2);
@@ -607,6 +543,14 @@
             document.getElementById('perShareTPDisplay').textContent = '+$' + perShareTP.toFixed(2);
             document.getElementById('perShareSLDisplay').textContent = '-$' + perShareSL.toFixed(2);
             document.getElementById('riskReward').textContent = '1:' + ratio;
+
+            // Update display with MYR values
+            document.getElementById('resultEntryMYR').textContent = 'RM ' + (entryPrice * USD_TO_MYR).toFixed(2);
+            document.getElementById('resultInvestmentMYR').textContent = 'RM ' + (investment * USD_TO_MYR).toFixed(2);
+            document.getElementById('resultTPMYR').textContent = 'RM ' + (tpPrice * USD_TO_MYR).toFixed(2);
+            document.getElementById('resultSLMYR').textContent = 'RM ' + (slPrice * USD_TO_MYR).toFixed(2);
+            document.getElementById('maxProfitMYR').textContent = '+RM ' + (maxProfit * USD_TO_MYR).toFixed(2);
+            document.getElementById('maxLossMYR').textContent = '-RM ' + (maxLoss * USD_TO_MYR).toFixed(2);
 
             // Update copy section
             document.getElementById('copyBuyPrice').textContent = entryPrice.toFixed(2);
@@ -680,27 +624,13 @@
             const maxLoss = (entryPrice - slPrice) * quantity;
             const ratio = (maxProfit / maxLoss).toFixed(1);
 
-            // Get currency symbol
-            const currencySymbol = currentCurrency === 'USD' ? '$' : 'RM';
-
-            // Apply currency conversion if in MYR
-            let displayEntry, displayTP, displaySL, displayInvestment, displayMaxProfit, displayMaxLoss;
-
-            if (currentCurrency === 'MYR') {
-                displayEntry = entryPrice * USD_TO_MYR;
-                displayTP = tpPrice * USD_TO_MYR;
-                displaySL = slPrice * USD_TO_MYR;
-                displayInvestment = investment * USD_TO_MYR;
-                displayMaxProfit = maxProfit * USD_TO_MYR;
-                displayMaxLoss = maxLoss * USD_TO_MYR;
-            } else {
-                displayEntry = entryPrice;
-                displayTP = tpPrice;
-                displaySL = slPrice;
-                displayInvestment = investment;
-                displayMaxProfit = maxProfit;
-                displayMaxLoss = maxLoss;
-            }
+            // Calculate MYR values
+            const entryMYR = entryPrice * USD_TO_MYR;
+            const tpMYR = tpPrice * USD_TO_MYR;
+            const slMYR = slPrice * USD_TO_MYR;
+            const investmentMYR = investment * USD_TO_MYR;
+            const maxProfitMYR = maxProfit * USD_TO_MYR;
+            const maxLossMYR = maxLoss * USD_TO_MYR;
 
             // Determine if risk/reward is good (ratio >= 2)
             const ratioEmoji = parseFloat(ratio) >= 2 ? '✅' : '⚠️';
@@ -720,21 +650,22 @@
             // Build title with stock name if provided
             const title = stockName ? `📊 ${stockName.toUpperCase()} TRADE SETUP` : '📊 TRADE SETUP';
 
-            // Generate the trade card in a clean format
+            // Generate the trade card in a clean format with both currencies
             const tradeCard = `
 ═══════════════
 ${title}
 ═══════════════
 📅 ${dateStr} • ${timeStr}
-💰 Entry Price: ${currencySymbol}${displayEntry.toFixed(2)}
+💰 Entry Price: $${entryPrice.toFixed(2)} (RM ${entryMYR.toFixed(2)})
 📦 Quantity: ${quantity} shares
-💵 Total Cost: ${currencySymbol}${displayInvestment.toFixed(2)}
+💵 Total Cost: $${investment.toFixed(2)} (RM ${investmentMYR.toFixed(2)})
 ═══════════════
-🎯 TAKE PROFIT: ${currencySymbol}${displayTP.toFixed(2)}
-   ↗️ +${tpPercent}% gain = +${currencySymbol}${displayMaxProfit.toFixed(2)}
-🛑 STOP LOSS: ${currencySymbol}${displaySL.toFixed(2)}
-   ↘️ -${slPercent}% loss = -${currencySymbol}${displayMaxLoss.toFixed(2)}
+🎯 TAKE PROFIT: $${tpPrice.toFixed(2)} (RM ${tpMYR.toFixed(2)})
+   ↗️ +${tpPercent}% gain = +$${maxProfit.toFixed(2)} (+RM ${maxProfitMYR.toFixed(2)})
+🛑 STOP LOSS: $${slPrice.toFixed(2)} (RM ${slMYR.toFixed(2)})
+   ↘️ -${slPercent}% loss = -$${maxLoss.toFixed(2)} (-RM ${maxLossMYR.toFixed(2)})
 ═══════════════
+Risk/Reward Ratio: 1:${ratio}
 `.trim();
 
             // Copy to clipboard
