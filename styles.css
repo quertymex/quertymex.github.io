@@ -1,0 +1,318 @@
+/* Theme variables */
+:root {
+    --bg-main: #131722;
+    --bg-card: #1E222D;
+    --bg-hover: #2A2E39;
+    --border-color: #363A45;
+    --text-primary: #ffffff;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+}
+
+body.light-mode {
+    --bg-main: #f3f4f6;
+    --bg-card: #ffffff;
+    --bg-hover: #e5e7eb;
+    --border-color: #d1d5db;
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+    background-color: var(--bg-main) !important;
+    transition: background-color 0.3s ease;
+}
+
+/* Apply theme colors */
+.bg-dark-bg { background-color: var(--bg-main) !important; }
+.bg-dark-card { background-color: var(--bg-card) !important; }
+.bg-dark-hover { background-color: var(--bg-hover) !important; }
+.bg-dark-hover:hover { background-color: var(--bg-hover) !important; }
+.border-dark-border { border-color: var(--border-color) !important; }
+.text-white { color: var(--text-primary) !important; }
+.text-gray-300 { color: var(--text-secondary) !important; }
+.text-gray-400 { color: var(--text-muted) !important; }
+.text-gray-500 { color: var(--text-muted) !important; }
+.text-gray-200 { color: var(--text-primary) !important; }
+
+/* Input styling */
+input {
+    color: var(--text-primary) !important;
+    background-color: var(--bg-main) !important;
+}
+
+input::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.6;
+}
+
+/* Button base styling */
+button {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+/* Smooth transitions for theme change */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Keep gradient buttons vibrant in both modes */
+.bg-gradient-to-r {
+    color: #ffffff !important;
+}
+
+/* Keep trading colors consistent */
+.text-trading-up,
+.border-trading-up {
+    color: #26a69a !important;
+    border-color: #26a69a !important;
+}
+
+.text-trading-down,
+.border-trading-down {
+    color: #ef5350 !important;
+    border-color: #ef5350 !important;
+}
+
+.text-trading-blue,
+.border-trading-blue {
+    color: #2962FF !important;
+    border-color: #2962FF !important;
+}
+
+.bg-trading-up {
+    background-color: #26a69a !important;
+}
+
+.bg-trading-down {
+    background-color: #ef5350 !important;
+}
+
+/* SVG icon colors adapt to theme */
+svg {
+    color: var(--text-muted);
+}
+
+button:hover svg {
+    color: var(--text-primary);
+}
+
+/* Light mode specific adjustments */
+body.light-mode .gradient-border {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Reset button styling */
+body.light-mode button[type="reset"] {
+    background-color: #f3f4f6 !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+body.light-mode button[type="reset"]:hover {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Success toast in light mode */
+body.light-mode #successMessage .bg-dark-card {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Market status dot visibility */
+.bg-gray-500 {
+    background-color: #9ca3af !important;
+}
+
+/* Ensure proper contrast for labels */
+label {
+    color: var(--text-secondary) !important;
+}
+
+/* Placeholder adjustments for better visibility */
+body.light-mode .placeholder-gray-500::placeholder {
+    color: #9ca3af !important;
+    opacity: 0.7;
+}
+
+/* Ensure proper card shadows in light mode */
+body.light-mode .bg-dark-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Fix gradient border content in light mode */
+body.light-mode .gradient-border-content {
+    background-color: var(--bg-card) !important;
+}
+
+/* Ensure all text is visible in light mode */
+body.light-mode .text-gray-400 {
+    color: #6b7280 !important;
+}
+
+body.light-mode .text-gray-500 {
+    color: #6b7280 !important;
+}
+
+/* Fix uppercase text visibility */
+body.light-mode .uppercase {
+    color: var(--text-muted) !important;
+}
+
+/* Ensure risk/reward section is readable */
+body.light-mode #riskReward {
+    color: var(--text-primary) !important;
+}
+
+/* Fix market countdown text */
+body.light-mode #marketCountdown {
+    color: var(--text-primary) !important;
+}
+
+/* Better input field contrast in light mode */
+body.light-mode input {
+    border-color: #d1d5db !important;
+}
+
+/* Ensure spans inside inputs/labels are visible */
+body.light-mode span {
+    color: inherit;
+}
+
+/* Fix info icon color */
+body.light-mode .text-trading-blue {
+    color: #2962FF !important;
+}
+
+/* Make sure market status text is visible */
+body.light-mode #marketStatus,
+body.light-mode #marketTime {
+    color: var(--text-primary) !important;
+}
+
+/* Fix exchange rate display */
+body.light-mode #exchangeRate,
+body.light-mode #rateTimestamp {
+    color: var(--text-primary) !important;
+}
+
+/* Ensure all result displays are visible */
+body.light-mode #resultEntry,
+body.light-mode #resultInvestment,
+body.light-mode #resultTP,
+body.light-mode #resultSL,
+body.light-mode #maxProfit,
+body.light-mode #maxLoss {
+    color: inherit !important;
+}
+
+/* Make MYR displays visible */
+body.light-mode #resultEntryMYR,
+body.light-mode #resultInvestmentMYR,
+body.light-mode #resultTPMYR,
+body.light-mode #resultSLMYR,
+body.light-mode #maxProfitMYR,
+body.light-mode #maxLossMYR,
+body.light-mode #perShareTPDisplay,
+body.light-mode #perShareSLDisplay {
+    color: #6b7280 !important;
+}
+
+/* Collapsible trade parameters */
+.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+.expanded {
+    max-height: 2000px;
+    overflow: visible;
+    opacity: 1;
+}
+
+/* Sticky positioning for collapsed card on mobile */
+@media (max-width: 1023px) {
+    #tradeParamsCard.sticky-collapsed {
+        position: sticky;
+        top: 1rem;
+        z-index: 40;
+    }
+}
+
+/* Animation transitions should be smooth */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.gradient-border {
+    position: relative;
+    background: linear-gradient(135deg, #2962FF 0%, #26a69a 100%);
+    padding: 2px;
+    border-radius: 8px;
+}
+
+.gradient-border-content {
+    background: #1E222D;
+    border-radius: 6px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.result-active {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.result-inactive {
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}

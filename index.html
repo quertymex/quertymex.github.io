@@ -26,71 +26,7 @@
             }
         }
     </script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
-        }
-
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-        .gradient-border {
-            position: relative;
-            background: linear-gradient(135deg, #2962FF 0%, #26a69a 100%);
-            padding: 2px;
-            border-radius: 8px;
-        }
-
-        .gradient-border-content {
-            background: #1E222D;
-            border-radius: 6px;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .result-active {
-            opacity: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .result-inactive {
-            opacity: 0.4;
-            transition: opacity 0.3s ease;
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .spin {
-            animation: spin 1s linear infinite;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-dark-bg min-h-screen text-gray-200">
     <!-- Main Container -->
@@ -110,6 +46,19 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
+                    <button
+                        id="themeToggle"
+                        onclick="toggleTheme()"
+                        class="p-2 bg-dark-card border border-dark-border rounded-lg hover:bg-dark-hover transition-all"
+                        title="Toggle theme"
+                    >
+                        <svg id="themeIconDark" class="w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                        <svg id="themeIconLight" class="hidden w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </button>
                     <div class="hidden md:flex items-center gap-2 text-xs text-gray-400">
                         <div class="flex items-center gap-1">
                             <div class="w-2 h-2 bg-trading-up rounded-full"></div>
@@ -136,32 +85,53 @@
             </div>
         </div>
 
-        <!-- Exchange Rate Info -->
-        <div class="mb-4 bg-dark-card rounded-lg border border-dark-border p-3">
-            <div class="flex items-center justify-between mb-1">
-                <div class="flex items-center gap-2 text-sm text-gray-400">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    <span>Exchange Rate:</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="text-sm font-semibold text-white">
-                        1 USD = <span id="exchangeRate" class="text-trading-blue">Loading...</span>
-                    </div>
-                    <button
-                        onclick="fetchExchangeRate()"
-                        class="p-1 hover:bg-dark-hover rounded transition-all"
-                        title="Refresh exchange rate"
-                        id="refreshRateBtn"
-                    >
-                        <svg id="refreshIcon" class="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <!-- Market Status & Exchange Rate Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Market Status -->
+            <div class="bg-dark-card rounded-lg border border-dark-border p-3">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                    </button>
+                        <span>US Market (EST):</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" id="marketStatusDot"></div>
+                        <span class="text-sm font-semibold" id="marketStatus">Loading...</span>
+                    </div>
                 </div>
+                <div class="text-xs text-gray-500" id="marketTime"></div>
+                <div class="mt-2 text-sm font-bold text-white" id="marketCountdown"></div>
             </div>
-            <div class="text-xs text-gray-500 text-right" id="rateTimestamp"></div>
+
+            <!-- Exchange Rate -->
+            <div class="bg-dark-card rounded-lg border border-dark-border p-3">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        <span>Exchange Rate:</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="text-sm font-semibold text-white">
+                            1 USD = <span id="exchangeRate" class="text-trading-blue">Loading...</span>
+                        </div>
+                        <button
+                            onclick="fetchExchangeRate()"
+                            class="p-1 hover:bg-dark-hover rounded transition-all"
+                            title="Refresh exchange rate"
+                            id="refreshRateBtn"
+                        >
+                            <svg id="refreshIcon" class="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="text-xs text-gray-500 text-right" id="rateTimestamp"></div>
+            </div>
         </div>
 
         <!-- Main Grid -->
@@ -169,14 +139,30 @@
             <!-- Left Column: Input Form -->
             <div class="space-y-4">
                 <!-- Input Card -->
-                <div class="bg-dark-card rounded-lg border border-dark-border p-6">
-                    <div class="flex items-center gap-2 mb-5">
-                        <svg class="w-5 h-5 text-trading-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        <h2 class="text-lg font-semibold text-white">Trade Parameters</h2>
+                <div id="tradeParamsCard" class="bg-dark-card rounded-lg border border-dark-border p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-trading-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                            <h2 class="text-lg font-semibold text-white">Trade Parameters</h2>
+                        </div>
+                        <button
+                            type="button"
+                            onclick="toggleTradeParams()"
+                            class="lg:hidden p-1 hover:bg-dark-hover rounded transition-all"
+                            id="toggleParamsBtn"
+                        >
+                            <svg id="chevronDown" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                            <svg id="chevronUp" class="hidden w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            </svg>
+                        </button>
                     </div>
 
+                    <div id="tradeParamsContent" class="transition-all duration-300 ease-in-out expanded">
                     <form id="tradeForm" class="space-y-4">
                         <!-- Stock Name (Optional) -->
                         <div>
@@ -213,14 +199,28 @@
                         <!-- Quantity -->
                         <div>
                             <label for="quantity" class="block text-sm font-medium text-gray-300 mb-2">Quantity (Shares)</label>
-                            <input
-                                type="number"
-                                id="quantity"
-                                placeholder="0"
-                                step="1"
-                                min="1"
-                                class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
-                            >
+                            <div class="relative">
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    placeholder="0"
+                                    step="1"
+                                    min="1"
+                                    class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
+                                >
+                                <div class="absolute inset-y-0 right-0 flex flex-col border-l border-dark-border">
+                                    <button type="button" onclick="incrementValue('quantity', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" onclick="decrementValue('quantity', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
                             <div id="quantityError" class="hidden mt-1 text-xs text-trading-down"></div>
                         </div>
 
@@ -234,12 +234,24 @@
                                         type="number"
                                         id="tpPercent"
                                         placeholder="0"
-                                        step="0.1"
+                                        step="1"
                                         min="0"
-                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-8 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-up focus:border-transparent transition"
+                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-up focus:border-transparent transition"
                                     >
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-400 text-sm">%</span>
+                                    <div class="absolute inset-y-0 right-0 flex items-center">
+                                        <span class="text-gray-400 text-sm px-2">%</span>
+                                        <div class="flex flex-col border-l border-dark-border h-full">
+                                            <button type="button" onclick="incrementValue('tpPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                                </svg>
+                                            </button>
+                                            <button type="button" onclick="decrementValue('tpPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="tpError" class="hidden mt-1 text-xs text-trading-down"></div>
@@ -253,12 +265,24 @@
                                         type="number"
                                         id="slPercent"
                                         placeholder="0"
-                                        step="0.1"
+                                        step="1"
                                         min="0"
-                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-8 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-down focus:border-transparent transition"
+                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-down focus:border-transparent transition"
                                     >
-                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-400 text-sm">%</span>
+                                    <div class="absolute inset-y-0 right-0 flex items-center">
+                                        <span class="text-gray-400 text-sm px-2">%</span>
+                                        <div class="flex flex-col border-l border-dark-border h-full">
+                                            <button type="button" onclick="incrementValue('slPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                                </svg>
+                                            </button>
+                                            <button type="button" onclick="decrementValue('slPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="slError" class="hidden mt-1 text-xs text-trading-down"></div>
@@ -276,67 +300,42 @@
                             </button>
                         </div>
                     </form>
-                </div>
 
-                <!-- Info Card -->
-                <div class="bg-dark-card rounded-lg border border-dark-border p-4">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-trading-blue flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm text-gray-300 leading-relaxed">
-                                Enter your entry price, quantity, and target percentages. Results will auto-calculate and display in both USD and MYR.
-                            </p>
+                    <!-- Info Text -->
+                    <div class="mt-4 pt-4 border-t border-dark-border">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-trading-blue flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm text-gray-300 leading-relaxed">
+                                    Enter your entry price, quantity, and target percentages. Results will auto-calculate and display in both USD and MYR.
+                                </p>
+                            </div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
 
             <!-- Right Column: Results -->
             <div class="space-y-4">
-                <!-- Quick Copy Section -->
-                <div id="copySection" class="result-inactive">
-                    <div class="bg-dark-card rounded-lg border border-dark-border p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                                </svg>
-                                <h3 class="text-sm font-semibold text-white">Quick Copy</h3>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-3 mb-3">
-                            <button onclick="copyPrice('buy')" class="group bg-dark-bg hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-all">
-                                <div class="text-xs text-gray-400 mb-1">BUY</div>
-                                <div class="text-sm font-bold text-trading-blue" id="copyBuyPrice">0.00</div>
-                            </button>
-                            <button onclick="copyPrice('tp')" class="group bg-dark-bg hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-all">
-                                <div class="text-xs text-gray-400 mb-1">TP</div>
-                                <div class="text-sm font-bold text-trading-up" id="copyTPPrice">0.00</div>
-                            </button>
-                            <button onclick="copyPrice('sl')" class="group bg-dark-bg hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-all">
-                                <div class="text-xs text-gray-400 mb-1">SL</div>
-                                <div class="text-sm font-bold text-trading-down" id="copySLPrice">0.00</div>
-                            </button>
-                        </div>
-                        <button onclick="exportTradeCard()" class="w-full bg-gradient-to-r from-trading-blue to-trading-up hover:opacity-90 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-                            </svg>
-                            Export Trade Card
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Results Section -->
                 <div id="results" class="result-inactive">
                     <div class="bg-dark-card rounded-lg border border-dark-border p-6">
-                        <div class="flex items-center gap-2 mb-5">
-                            <svg class="w-5 h-5 text-trading-up" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                            </svg>
-                            <h2 class="text-lg font-semibold text-white">Trade Analysis</h2>
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-trading-up" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                <h2 class="text-lg font-semibold text-white">Trade Analysis</h2>
+                            </div>
+                            <button onclick="exportTradeCard()" class="bg-gradient-to-r from-trading-blue to-trading-up hover:opacity-90 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-all flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                </svg>
+                                Export
+                            </button>
                         </div>
 
                         <!-- Price Levels -->
@@ -400,312 +399,6 @@
         </div>
     </div>
 
-    <script>
-        // Currency state
-        let USD_TO_MYR = 4.50; // Default fallback rate
-        let isLoadingRate = false;
-
-        // Fetch real-time exchange rate on page load
-        async function fetchExchangeRate() {
-            if (isLoadingRate) return; // Prevent multiple simultaneous requests
-
-            try {
-                isLoadingRate = true;
-                updateRateDisplay('Loading...');
-
-                // Add spin animation to refresh icon
-                const refreshIcon = document.getElementById('refreshIcon');
-                if (refreshIcon) refreshIcon.classList.add('spin');
-
-                // Using exchangerate-api.com (free tier)
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-                const data = await response.json();
-
-                if (data && data.rates && data.rates.MYR) {
-                    USD_TO_MYR = data.rates.MYR;
-                    updateRateDisplay(`${USD_TO_MYR.toFixed(4)} MYR`);
-                    console.log('Exchange rate updated:', USD_TO_MYR);
-
-                    // If results are visible, recalculate to update MYR values
-                    const results = document.getElementById('results');
-                    if (results.classList.contains('result-active')) {
-                        autoCalculate();
-                    }
-                } else {
-                    throw new Error('Invalid response');
-                }
-            } catch (error) {
-                console.error('Error fetching exchange rate:', error);
-                updateRateDisplay(`${USD_TO_MYR.toFixed(2)} MYR (Offline)`);
-            } finally {
-                isLoadingRate = false;
-
-                // Remove spin animation
-                const refreshIcon = document.getElementById('refreshIcon');
-                if (refreshIcon) refreshIcon.classList.remove('spin');
-            }
-        }
-
-        function updateRateDisplay(rateText, showTimestamp = true) {
-            const rateElement = document.getElementById('exchangeRate');
-            if (rateElement) {
-                rateElement.innerHTML = `<span class="text-trading-blue">${rateText}</span>`;
-            }
-
-            if (showTimestamp && !rateText.includes('Loading')) {
-                const timestampElement = document.getElementById('rateTimestamp');
-                if (timestampElement) {
-                    const now = new Date();
-                    const timeString = now.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    timestampElement.textContent = `Updated: ${timeString}`;
-                }
-            }
-        }
-
-        // Fetch rate when page loads
-        window.addEventListener('DOMContentLoaded', fetchExchangeRate);
-
-        function calculateTradeLevels() {
-
-            // Get input values
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
-            const slPercent = parseFloat(document.getElementById('slPercent').value);
-
-            // Validation
-            let isValid = true;
-            const errors = {
-                entry: '',
-                quantity: '',
-                tp: '',
-                sl: ''
-            };
-
-            if (!entryPrice || entryPrice <= 0) {
-                errors.entry = 'Entry price must be greater than 0';
-                isValid = false;
-            }
-
-            if (!quantity || quantity <= 0) {
-                errors.quantity = 'Quantity must be greater than 0';
-                isValid = false;
-            }
-
-            if (isNaN(tpPercent) || tpPercent < 0) {
-                errors.tp = 'TP must be 0 or greater';
-                isValid = false;
-            }
-
-            if (isNaN(slPercent) || slPercent < 0) {
-                errors.sl = 'SL must be 0 or greater';
-                isValid = false;
-            }
-
-            // Display errors
-            for (const [field, error] of Object.entries(errors)) {
-                const errorElement = document.getElementById(field + 'Error');
-                if (error) {
-                    errorElement.textContent = error;
-                    errorElement.classList.remove('hidden');
-                } else {
-                    errorElement.classList.add('hidden');
-                }
-            }
-
-            if (!isValid) return;
-
-            // Calculate prices
-            const tpPrice = entryPrice * (1 + tpPercent / 100);
-            const slPrice = entryPrice * (1 - slPercent / 100);
-
-            // Calculate amounts
-            const investment = entryPrice * quantity;
-            const maxProfit = (tpPrice - entryPrice) * quantity;
-            const maxLoss = (entryPrice - slPrice) * quantity;
-            const perShareTP = tpPrice - entryPrice;
-            const perShareSL = entryPrice - slPrice;
-
-            // Calculate risk/reward ratio
-            const ratio = (maxProfit / maxLoss).toFixed(1);
-
-            // Update display with USD values
-            document.getElementById('resultEntry').textContent = '$' + entryPrice.toFixed(2);
-            document.getElementById('resultInvestment').textContent = '$' + investment.toFixed(2);
-            document.getElementById('resultTP').textContent = '$' + tpPrice.toFixed(2);
-            document.getElementById('resultSL').textContent = '$' + slPrice.toFixed(2);
-            document.getElementById('maxProfit').textContent = '+$' + maxProfit.toFixed(2);
-            document.getElementById('maxLoss').textContent = '-$' + maxLoss.toFixed(2);
-            document.getElementById('perShareTPDisplay').textContent = '+$' + perShareTP.toFixed(2);
-            document.getElementById('perShareSLDisplay').textContent = '-$' + perShareSL.toFixed(2);
-            document.getElementById('riskReward').textContent = '1:' + ratio;
-
-            // Update display with MYR values
-            document.getElementById('resultEntryMYR').textContent = 'RM ' + (entryPrice * USD_TO_MYR).toFixed(2);
-            document.getElementById('resultInvestmentMYR').textContent = 'RM ' + (investment * USD_TO_MYR).toFixed(2);
-            document.getElementById('resultTPMYR').textContent = 'RM ' + (tpPrice * USD_TO_MYR).toFixed(2);
-            document.getElementById('resultSLMYR').textContent = 'RM ' + (slPrice * USD_TO_MYR).toFixed(2);
-            document.getElementById('maxProfitMYR').textContent = '+RM ' + (maxProfit * USD_TO_MYR).toFixed(2);
-            document.getElementById('maxLossMYR').textContent = '-RM ' + (maxLoss * USD_TO_MYR).toFixed(2);
-
-            // Update copy section
-            document.getElementById('copyBuyPrice').textContent = entryPrice.toFixed(2);
-            document.getElementById('copyTPPrice').textContent = tpPrice.toFixed(2);
-            document.getElementById('copySLPrice').textContent = slPrice.toFixed(2);
-
-            // Show results with animation
-            document.getElementById('results').classList.remove('result-inactive');
-            document.getElementById('results').classList.add('result-active');
-            document.getElementById('copySection').classList.remove('result-inactive');
-            document.getElementById('copySection').classList.add('result-active');
-        }
-
-        function resetCalculator() {
-            document.getElementById('tradeForm').reset();
-            document.getElementById('results').classList.remove('result-active');
-            document.getElementById('results').classList.add('result-inactive');
-            document.getElementById('copySection').classList.remove('result-active');
-            document.getElementById('copySection').classList.add('result-inactive');
-
-            // Clear errors
-            document.querySelectorAll('[id$="Error"]').forEach(el => {
-                el.classList.add('hidden');
-                el.textContent = '';
-            });
-        }
-
-        function copyPrice(type) {
-            let text = '';
-            if (type === 'buy') {
-                text = document.getElementById('copyBuyPrice').textContent;
-            } else if (type === 'tp') {
-                text = document.getElementById('copyTPPrice').textContent;
-            } else if (type === 'sl') {
-                text = document.getElementById('copySLPrice').textContent;
-            }
-
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccessMessage();
-            });
-        }
-
-        function showSuccessMessage() {
-            const message = document.getElementById('successMessage');
-            message.classList.remove('hidden');
-            setTimeout(() => {
-                message.classList.add('hidden');
-            }, 2000);
-        }
-
-        function exportTradeCard() {
-            // Check if results are available
-            const results = document.getElementById('results');
-            if (!results.classList.contains('result-active')) {
-                alert('Please calculate trade levels first before exporting.');
-                return;
-            }
-
-            // Get values from the form
-            const stockName = document.getElementById('stockName').value.trim();
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
-            const slPercent = parseFloat(document.getElementById('slPercent').value);
-
-            // Calculate values
-            const tpPrice = entryPrice * (1 + tpPercent / 100);
-            const slPrice = entryPrice * (1 - slPercent / 100);
-            const investment = entryPrice * quantity;
-            const maxProfit = (tpPrice - entryPrice) * quantity;
-            const maxLoss = (entryPrice - slPrice) * quantity;
-            const ratio = (maxProfit / maxLoss).toFixed(1);
-
-            // Calculate MYR values
-            const entryMYR = entryPrice * USD_TO_MYR;
-            const tpMYR = tpPrice * USD_TO_MYR;
-            const slMYR = slPrice * USD_TO_MYR;
-            const investmentMYR = investment * USD_TO_MYR;
-            const maxProfitMYR = maxProfit * USD_TO_MYR;
-            const maxLossMYR = maxLoss * USD_TO_MYR;
-
-            // Determine if risk/reward is good (ratio >= 2)
-            const ratioEmoji = parseFloat(ratio) >= 2 ? '✅' : '⚠️';
-
-            // Get current date and time
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-            const timeStr = now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            // Build title with stock name if provided
-            const title = stockName ? `📊 ${stockName.toUpperCase()} TRADE SETUP` : '📊 TRADE SETUP';
-
-            // Generate the trade card in a clean format with both currencies
-            const tradeCard = `
-═══════════════
-${title}
-═══════════════
-📅 ${dateStr} • ${timeStr}
-💰 Entry Price: $${entryPrice.toFixed(2)} (RM ${entryMYR.toFixed(2)})
-📦 Quantity: ${quantity} shares
-💵 Total Cost: $${investment.toFixed(2)} (RM ${investmentMYR.toFixed(2)})
-═══════════════
-🎯 TAKE PROFIT: $${tpPrice.toFixed(2)} (RM ${tpMYR.toFixed(2)})
-   ↗️ +${tpPercent}% gain = +$${maxProfit.toFixed(2)} (+RM ${maxProfitMYR.toFixed(2)})
-🛑 STOP LOSS: $${slPrice.toFixed(2)} (RM ${slMYR.toFixed(2)})
-   ↘️ -${slPercent}% loss = -$${maxLoss.toFixed(2)} (-RM ${maxLossMYR.toFixed(2)})
-═══════════════
-Risk/Reward Ratio: 1:${ratio}
-`.trim();
-
-            // Copy to clipboard
-            navigator.clipboard.writeText(tradeCard).then(() => {
-                showSuccessMessage();
-            }).catch(err => {
-                console.error('Failed to copy trade card:', err);
-                alert('Failed to copy to clipboard. Please try again.');
-            });
-        }
-
-        // Auto-calculate on input change
-        function autoCalculate() {
-            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const tpPercent = parseFloat(document.getElementById('tpPercent').value);
-            const slPercent = parseFloat(document.getElementById('slPercent').value);
-
-            // Only auto-calculate if we have at least entry price and quantity
-            if (entryPrice && entryPrice > 0 && quantity && quantity > 0) {
-                calculateTradeLevels();
-            }
-        }
-
-        // Add event listeners to all input fields
-        document.getElementById('entryPrice').addEventListener('input', autoCalculate);
-        document.getElementById('quantity').addEventListener('input', autoCalculate);
-        document.getElementById('tpPercent').addEventListener('input', autoCalculate);
-        document.getElementById('slPercent').addEventListener('input', autoCalculate);
-
-        // Clear error on input
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            input.addEventListener('input', function() {
-                const fieldName = this.id;
-                const errorElement = document.getElementById(fieldName.replace('Price', '').replace('Percent', '') + 'Error');
-                if (errorElement) {
-                    errorElement.classList.add('hidden');
-                }
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
