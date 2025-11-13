@@ -164,22 +164,36 @@
 
                     <div id="tradeParamsContent" class="transition-all duration-300 ease-in-out expanded">
                     <form id="tradeForm" class="space-y-4">
-                        <!-- Stock Name (Optional) -->
+                        <!-- Stock Symbol -->
                         <div>
-                            <label for="stockName" class="block text-sm font-medium text-gray-300 mb-2">
-                                Stock Name <span class="text-gray-500 text-xs">(Optional)</span>
+                            <label for="stockSymbol" class="block text-sm font-medium text-gray-300 mb-2">
+                                Stock Symbol
                             </label>
                             <input
                                 type="text"
-                                id="stockName"
-                                placeholder="e.g., AAPL, TSLA"
-                                class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
+                                id="stockSymbol"
+                                placeholder="e.g., AAPL, TSLA, GOOGL"
+                                class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition uppercase"
                             >
                         </div>
 
                         <!-- Entry Price -->
                         <div>
-                            <label for="entryPrice" class="block text-sm font-medium text-gray-300 mb-2">Entry Price (USD)</label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="entryPrice" class="text-sm font-medium text-gray-300">Entry Price (USD)</label>
+                                <button
+                                    type="button"
+                                    id="autoPriceToggle"
+                                    onclick="toggleAutoPrice()"
+                                    class="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border transition-all"
+                                    title="Toggle auto-fetch price"
+                                >
+                                    <div class="relative w-8 h-4 bg-gray-600 rounded-full transition-colors" id="toggleBg">
+                                        <div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform" id="toggleDot"></div>
+                                    </div>
+                                    <span id="toggleText" class="text-gray-400">Auto-Price</span>
+                                </button>
+                            </div>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span class="text-gray-400 text-sm">$</span>

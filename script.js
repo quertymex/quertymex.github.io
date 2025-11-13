@@ -391,7 +391,7 @@ function exportTradeCard() {
     }
 
     // Get values from the form
-    const stockName = document.getElementById('stockName').value.trim();
+    const stockSymbol = document.getElementById('stockSymbol').value.trim();
     const entryPrice = parseFloat(document.getElementById('entryPrice').value);
     const quantity = parseInt(document.getElementById('quantity').value);
     const tpPercent = parseFloat(document.getElementById('tpPercent').value);
@@ -428,8 +428,8 @@ function exportTradeCard() {
         minute: '2-digit'
     });
 
-    // Build title with stock name if provided
-    const title = stockName ? `📊 ${stockName.toUpperCase()} TRADE SETUP` : '📊 TRADE SETUP';
+    // Build title with stock symbol if provided
+    const title = stockSymbol ? `📊 ${stockSymbol.toUpperCase()} TRADE SETUP` : '📊 TRADE SETUP';
 
     // Generate the trade card in a clean format with both currencies
     const tradeCard = `
@@ -487,3 +487,234 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
         }
     });
 });
+
+// Auto-Price Toggle Functionality
+let autoPriceEnabled = false;
+const PRICE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+function toggleAutoPrice() {
+    autoPriceEnabled = !autoPriceEnabled;
+
+    const toggleBg = document.getElementById('toggleBg');
+    const toggleDot = document.getElementById('toggleDot');
+    const toggleText = document.getElementById('toggleText');
+    const autoPriceToggle = document.getElementById('autoPriceToggle');
+
+    if (autoPriceEnabled) {
+        // Enable auto-price
+        toggleBg.className = 'relative w-8 h-4 bg-trading-blue rounded-full transition-colors';
+        toggleDot.className = 'absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
+        toggleText.className = 'text-trading-blue';
+        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-trading-blue transition-all';
+
+        // Save state
+        localStorage.setItem('autoPriceEnabled', 'true');
+
+        // Fetch price if stock symbol is entered
+        const stockSymbol = document.getElementById('stockSymbol').value.trim();
+        if (stockSymbol) {
+            fetchStockPrice(stockSymbol);
+        }
+    } else {
+        // Disable auto-price
+        toggleBg.className = 'relative w-8 h-4 bg-gray-600 rounded-full transition-colors';
+        toggleDot.className = 'absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
+        toggleText.className = 'text-gray-400';
+        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-dark-border transition-all';
+
+        // Save state
+        localStorage.setItem('autoPriceEnabled', 'false');
+    }
+}
+
+// Load auto-price state on page load
+function loadAutoPriceState() {
+    const savedState = localStorage.getItem('autoPriceEnabled');
+    if (savedState === 'true') {
+        autoPriceEnabled = true;
+        const toggleBg = document.getElementById('toggleBg');
+        const toggleDot = document.getElementById('toggleDot');
+        const toggleText = document.getElementById('toggleText');
+        const autoPriceToggle = document.getElementById('autoPriceToggle');
+
+        toggleBg.className = 'relative w-8 h-4 bg-trading-blue rounded-full transition-colors';
+        toggleDot.className = 'absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
+        toggleText.className = 'text-trading-blue';
+        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-trading-blue transition-all';
+    }
+}
+
+// Fetch stock price using free APIs
+async function fetchStockPrice(symbol) {
+    if (!symbol || !autoPriceEnabled) return;
+
+    const upperSymbol = symbol.toUpperCase();
+    const entryPriceInput = document.getElementById('entryPrice');
+
+    // Check cache first
+    const cachedData = getCachedPrice(upperSymbol);
+    if (cachedData) {
+        console.log('Using cached price for', upperSymbol, ':', cachedData.price);
+        entryPriceInput.value = cachedData.price.toFixed(2);
+        entryPriceInput.dispatchEvent(new Event('input'));
+        return;
+    }
+
+    try {
+        // Show loading state
+        entryPriceInput.placeholder = 'Fetching price...';
+
+        let currentPrice = null;
+
+        // Method 1: Try Yahoo Finance via CORS proxy
+        try {
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${upperSymbol}`;
+            const corsProxy = 'https://api.allorigins.win/raw?url=';
+            const response1 = await fetch(corsProxy + encodeURIComponent(yahooUrl));
+
+            if (response1.ok) {
+                const data1 = await response1.json();
+                if (data1.chart && data1.chart.result && data1.chart.result[0]) {
+                    const result = data1.chart.result[0];
+                    const meta = result.meta;
+                    if (meta.regularMarketPrice) {
+                        currentPrice = meta.regularMarketPrice;
+                        console.log('Fetched from Yahoo Finance:', currentPrice);
+                    }
+                }
+            }
+        } catch (e) {
+            console.log('Yahoo Finance failed, trying alternative...', e);
+        }
+
+        // Method 2: Try Finnhub API (free tier with demo key)
+        if (!currentPrice) {
+            try {
+                // Get a free API key at https://finnhub.io (60 calls/minute free)
+                const finnhubKey = 'ctguukhr01ql2bu46te0ctguukhr01ql2bu46teg'; // Demo key
+                const response2 = await fetch(`https://finnhub.io/api/v1/quote?symbol=${upperSymbol}&token=${finnhubKey}`);
+
+                if (response2.ok) {
+                    const data2 = await response2.json();
+                    if (data2.c && data2.c > 0) {
+                        currentPrice = data2.c; // Current price
+                        console.log('Fetched from Finnhub:', currentPrice);
+                    }
+                }
+            } catch (e) {
+                console.log('Finnhub failed, trying alternative...', e);
+            }
+        }
+
+        // Method 3: Try Twelve Data API
+        if (!currentPrice) {
+            try {
+                const response3 = await fetch(`https://api.twelvedata.com/price?symbol=${upperSymbol}&apikey=demo`);
+
+                if (response3.ok) {
+                    const data3 = await response3.json();
+                    if (data3.price && !isNaN(parseFloat(data3.price))) {
+                        currentPrice = parseFloat(data3.price);
+                        console.log('Fetched from Twelve Data:', currentPrice);
+                    }
+                }
+            } catch (e) {
+                console.log('Twelve Data failed', e);
+            }
+        }
+
+        if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
+            // Cache the price
+            cachePrice(upperSymbol, currentPrice);
+
+            // Update entry price
+            entryPriceInput.value = currentPrice.toFixed(2);
+            entryPriceInput.placeholder = '0.00';
+
+            // Trigger auto-calculation
+            entryPriceInput.dispatchEvent(new Event('input'));
+
+            console.log(`✓ Successfully fetched price for ${upperSymbol}: $${currentPrice.toFixed(2)}`);
+        } else {
+            throw new Error('Unable to fetch price from any source');
+        }
+    } catch (error) {
+        console.error('Error fetching stock price:', error);
+        entryPriceInput.placeholder = 'Enter manually';
+
+        // Show user-friendly message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'text-xs text-trading-down mt-1';
+        errorMsg.textContent = 'Auto-fetch unavailable. Please enter price manually.';
+        errorMsg.id = 'priceFetchError';
+
+        const existingError = document.getElementById('priceFetchError');
+        if (existingError) existingError.remove();
+
+        entryPriceInput.parentElement.parentElement.appendChild(errorMsg);
+
+        // Reset placeholder after 3 seconds
+        setTimeout(() => {
+            entryPriceInput.placeholder = '0.00';
+            const err = document.getElementById('priceFetchError');
+            if (err) err.remove();
+        }, 3000);
+    }
+}
+
+// Cache management
+function getCachedPrice(symbol) {
+    const cacheKey = `stockPrice_${symbol}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+        const data = JSON.parse(cached);
+        const now = Date.now();
+
+        // Check if cache is still valid
+        if (now - data.timestamp < PRICE_CACHE_DURATION) {
+            return data;
+        } else {
+            // Remove expired cache
+            localStorage.removeItem(cacheKey);
+        }
+    }
+
+    return null;
+}
+
+function cachePrice(symbol, price) {
+    const cacheKey = `stockPrice_${symbol}`;
+    const data = {
+        symbol: symbol,
+        price: price,
+        timestamp: Date.now()
+    };
+
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+}
+
+// Listen for stock symbol changes
+document.getElementById('stockSymbol').addEventListener('input', function() {
+    const symbol = this.value.trim();
+    const entryPriceInput = document.getElementById('entryPrice');
+
+    // Debounce the API call
+    clearTimeout(this.debounceTimer);
+
+    // Clear entry price when symbol changes (if auto-price is on)
+    if (autoPriceEnabled && !symbol) {
+        entryPriceInput.value = '';
+        entryPriceInput.placeholder = '0.00';
+    }
+
+    // Fetch new price if symbol is entered and auto-price is enabled
+    if (symbol && autoPriceEnabled) {
+        this.debounceTimer = setTimeout(() => {
+            fetchStockPrice(symbol);
+        }, 500); // Wait 500ms after user stops typing
+    }
+});
+
+// Load auto-price state when page loads
+window.addEventListener('DOMContentLoaded', loadAutoPriceState);
