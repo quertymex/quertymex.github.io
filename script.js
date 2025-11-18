@@ -1,3 +1,308 @@
+// ============================================
+// TAB MANAGEMENT SYSTEM
+// ============================================
+
+// Tab state
+let tabs = [];
+let activeTabId = null;
+const MAX_TABS = 20; // Maximum number of tabs allowed
+
+// Initialize tab system on page load
+function initTabSystem() {
+    // Load tabs from localStorage or create first tab
+    const savedTabs = localStorage.getItem('stockTabs');
+    if (savedTabs) {
+        tabs = JSON.parse(savedTabs);
+        activeTabId = localStorage.getItem('activeTabId') || tabs[0]?.id || null;
+    }
+
+    // If no tabs exist, create the first one
+    if (tabs.length === 0) {
+        addNewTab();
+    } else {
+        renderTabs();
+        // Load the active tab's state
+        if (activeTabId) {
+            loadTabState(activeTabId);
+        }
+    }
+}
+
+// Generate unique tab ID
+function generateTabId() {
+    return 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Add new tab
+function addNewTab() {
+    if (tabs.length >= MAX_TABS) {
+        alert(`Maximum ${MAX_TABS} tabs allowed. Please close some tabs to add new ones.`);
+        return;
+    }
+
+    // Save current tab state before creating new one
+    if (activeTabId) {
+        saveCurrentTabState();
+    }
+
+    const newTab = {
+        id: generateTabId(),
+        name: 'New Tab',
+        stockSymbol: '',
+        entryPrice: '',
+        quantity: '',
+        tpPercent: '',
+        slPercent: '',
+        autoPriceEnabled: false,
+        createdAt: Date.now()
+    };
+
+    tabs.push(newTab);
+    activeTabId = newTab.id;
+
+    // Save and render
+    saveTabsToStorage();
+    renderTabs();
+
+    // Clear the form for new tab
+    clearCalculatorForm();
+}
+
+// Render all tabs
+function renderTabs() {
+    const tabsContainer = document.getElementById('tabsContainer');
+    tabsContainer.innerHTML = '';
+
+    tabs.forEach((tab, index) => {
+        const tabElement = createTabElement(tab);
+        tabsContainer.appendChild(tabElement);
+    });
+}
+
+// Create tab element
+function createTabElement(tab) {
+    const tabDiv = document.createElement('div');
+    tabDiv.className = `stock-tab tab-slide-in ${tab.id === activeTabId ? 'active' : ''}`;
+    tabDiv.setAttribute('data-tab-id', tab.id);
+
+    // Display stock symbol if available, otherwise show tab number
+    const tabIndex = tabs.findIndex(t => t.id === tab.id) + 1;
+    const displayName = tab.stockSymbol ? tab.stockSymbol.toUpperCase() : `Tab ${tabIndex}`;
+
+    tabDiv.innerHTML = `
+        <span class="tab-name" title="${displayName}">${displayName}</span>
+        <button
+            onclick="closeTab(event, '${tab.id}')"
+            class="tab-close"
+            title="Close tab"
+        >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    `;
+
+    // Add click handler to switch tabs
+    tabDiv.addEventListener('click', (e) => {
+        // Don't switch if clicking close button
+        if (!e.target.closest('.tab-close')) {
+            switchTab(tab.id);
+        }
+    });
+
+    return tabDiv;
+}
+
+// Switch to a different tab
+function switchTab(tabId) {
+    if (tabId === activeTabId) return;
+
+    // Save current tab state
+    if (activeTabId) {
+        saveCurrentTabState();
+    }
+
+    // Switch to new tab
+    activeTabId = tabId;
+    localStorage.setItem('activeTabId', activeTabId);
+
+    // Update UI
+    renderTabs();
+    loadTabState(tabId);
+}
+
+// Close tab
+function closeTab(event, tabId) {
+    event.stopPropagation();
+
+    // Don't allow closing the last tab
+    if (tabs.length === 1) {
+        alert('Cannot close the last tab. At least one tab must remain open.');
+        return;
+    }
+
+    // Confirm before closing if tab has data
+    const tab = tabs.find(t => t.id === tabId);
+    if (tab && tab.stockSymbol) {
+        if (!confirm(`Close tab "${tab.stockSymbol.toUpperCase()}"?`)) {
+            return;
+        }
+    }
+
+    // Remove tab
+    const tabIndex = tabs.findIndex(t => t.id === tabId);
+    tabs.splice(tabIndex, 1);
+
+    // If we closed the active tab, switch to another
+    if (tabId === activeTabId) {
+        // Switch to the tab to the left, or the first tab if we closed the first tab
+        const newActiveIndex = Math.max(0, tabIndex - 1);
+        activeTabId = tabs[newActiveIndex].id;
+        localStorage.setItem('activeTabId', activeTabId);
+        loadTabState(activeTabId);
+    }
+
+    // Save and render
+    saveTabsToStorage();
+    renderTabs();
+}
+
+// Clear all tabs
+function clearAllTabs() {
+    // Confirm before clearing all tabs
+    const tabCount = tabs.length;
+    const hasData = tabs.some(tab => tab.stockSymbol || tab.entryPrice || tab.quantity);
+
+    let confirmMessage = `Clear all ${tabCount} tab${tabCount > 1 ? 's' : ''}?`;
+    if (hasData) {
+        confirmMessage = `⚠️ This will delete all ${tabCount} tab${tabCount > 1 ? 's' : ''} and their data. This action cannot be undone.\n\nAre you sure?`;
+    }
+
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+
+    // Clear all tabs and create a fresh one
+    tabs = [];
+    activeTabId = null;
+
+    // Clear localStorage
+    localStorage.removeItem('stockTabs');
+    localStorage.removeItem('activeTabId');
+
+    // Create a fresh tab
+    addNewTab();
+}
+
+// Save current tab state
+function saveCurrentTabState() {
+    const tab = tabs.find(t => t.id === activeTabId);
+    if (!tab) return;
+
+    // Get current form values
+    tab.stockSymbol = document.getElementById('stockSymbol').value.trim();
+    tab.entryPrice = document.getElementById('entryPrice').value;
+    tab.quantity = document.getElementById('quantity').value;
+    tab.tpPercent = document.getElementById('tpPercent').value;
+    tab.slPercent = document.getElementById('slPercent').value;
+    tab.autoPriceEnabled = autoPriceEnabled;
+
+    // Update tab name in the UI
+    saveTabsToStorage();
+    renderTabs();
+}
+
+// Load tab state into form
+function loadTabState(tabId) {
+    const tab = tabs.find(t => t.id === tabId);
+    if (!tab) return;
+
+    // Restore form values
+    document.getElementById('stockSymbol').value = tab.stockSymbol || '';
+    document.getElementById('entryPrice').value = tab.entryPrice || '';
+    document.getElementById('quantity').value = tab.quantity || '';
+    document.getElementById('tpPercent').value = tab.tpPercent || '';
+    document.getElementById('slPercent').value = tab.slPercent || '';
+
+    // Restore auto-price state
+    if (tab.autoPriceEnabled !== autoPriceEnabled) {
+        autoPriceEnabled = tab.autoPriceEnabled;
+        updateAutoPriceUI();
+    }
+
+    // Recalculate if we have data
+    if (tab.entryPrice && tab.quantity) {
+        autoCalculate();
+    } else {
+        // Hide results if no data
+        document.getElementById('results').classList.remove('result-active');
+        document.getElementById('results').classList.add('result-inactive');
+    }
+}
+
+// Clear calculator form
+function clearCalculatorForm() {
+    document.getElementById('tradeForm').reset();
+    document.getElementById('results').classList.remove('result-active');
+    document.getElementById('results').classList.add('result-inactive');
+
+    // Clear errors
+    document.querySelectorAll('[id$="Error"]').forEach(el => {
+        el.classList.add('hidden');
+        el.textContent = '';
+    });
+
+    // Reset auto-price if needed
+    autoPriceEnabled = false;
+    updateAutoPriceUI();
+}
+
+// Save tabs to localStorage
+function saveTabsToStorage() {
+    localStorage.setItem('stockTabs', JSON.stringify(tabs));
+    localStorage.setItem('activeTabId', activeTabId);
+}
+
+// Update auto-price UI without triggering toggle
+function updateAutoPriceUI() {
+    const toggleBg = document.getElementById('toggleBg');
+    const toggleDot = document.getElementById('toggleDot');
+    const toggleText = document.getElementById('toggleText');
+    const autoPriceToggle = document.getElementById('autoPriceToggle');
+
+    if (autoPriceEnabled) {
+        toggleBg.className = 'relative w-8 h-4 bg-trading-blue rounded-full transition-colors';
+        toggleDot.className = 'absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
+        toggleText.className = 'text-trading-blue';
+        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-trading-blue transition-all';
+    } else {
+        toggleBg.className = 'relative w-8 h-4 bg-gray-600 rounded-full transition-colors';
+        toggleDot.className = 'absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
+        toggleText.className = 'text-gray-400';
+        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-dark-border transition-all';
+    }
+}
+
+// Listen to stock symbol changes to update tab name
+document.addEventListener('DOMContentLoaded', function() {
+    const stockSymbolInput = document.getElementById('stockSymbol');
+    if (stockSymbolInput) {
+        stockSymbolInput.addEventListener('input', function() {
+            // Save current tab state which will update the tab name
+            if (activeTabId) {
+                saveCurrentTabState();
+            }
+        });
+    }
+});
+
+// Initialize tabs when page loads
+window.addEventListener('DOMContentLoaded', initTabSystem);
+
+// ============================================
+// THEME MANAGEMENT
+// ============================================
+
 // Theme management
 function toggleTheme() {
     const body = document.body;
@@ -507,9 +812,6 @@ function toggleAutoPrice() {
         toggleText.className = 'text-trading-blue';
         autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-trading-blue transition-all';
 
-        // Save state
-        localStorage.setItem('autoPriceEnabled', 'true');
-
         // Fetch price if stock symbol is entered
         const stockSymbol = document.getElementById('stockSymbol').value.trim();
         if (stockSymbol) {
@@ -521,28 +823,15 @@ function toggleAutoPrice() {
         toggleDot.className = 'absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
         toggleText.className = 'text-gray-400';
         autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-dark-border transition-all';
+    }
 
-        // Save state
-        localStorage.setItem('autoPriceEnabled', 'false');
+    // Save state to current tab
+    if (activeTabId) {
+        saveCurrentTabState();
     }
 }
 
-// Load auto-price state on page load
-function loadAutoPriceState() {
-    const savedState = localStorage.getItem('autoPriceEnabled');
-    if (savedState === 'true') {
-        autoPriceEnabled = true;
-        const toggleBg = document.getElementById('toggleBg');
-        const toggleDot = document.getElementById('toggleDot');
-        const toggleText = document.getElementById('toggleText');
-        const autoPriceToggle = document.getElementById('autoPriceToggle');
-
-        toggleBg.className = 'relative w-8 h-4 bg-trading-blue rounded-full transition-colors';
-        toggleDot.className = 'absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform';
-        toggleText.className = 'text-trading-blue';
-        autoPriceToggle.className = 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg border border-trading-blue transition-all';
-    }
-}
+// Note: loadAutoPriceState removed - now handled per-tab in loadTabState()
 
 // Fetch stock price using free APIs
 async function fetchStockPrice(symbol) {
@@ -716,5 +1005,4 @@ document.getElementById('stockSymbol').addEventListener('input', function() {
     }
 });
 
-// Load auto-price state when page loads
-window.addEventListener('DOMContentLoaded', loadAutoPriceState);
+// Note: Auto-price state is now loaded per-tab via initTabSystem() and loadTabState()
