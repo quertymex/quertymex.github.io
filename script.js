@@ -6,6 +6,7 @@
 let tabs = [];
 let activeTabId = null;
 const MAX_TABS = 20; // Maximum number of tabs allowed
+let calculationMode = 'current'; // 'current' or 'target'
 
 // Initialize tab system on page load
 function initTabSystem() {
@@ -26,6 +27,9 @@ function initTabSystem() {
             loadTabState(activeTabId);
         }
     }
+
+    // Initialize calculation mode UI
+    updateCalculationModeUI();
 }
 
 // Generate unique tab ID
@@ -50,10 +54,12 @@ function addNewTab() {
         name: 'New Tab',
         stockSymbol: '',
         entryPrice: '',
+        targetPrice: '',
         quantity: '',
         tpPercent: '',
         slPercent: '',
         autoPriceEnabled: false,
+        calculationMode: 'current',
         createdAt: Date.now()
     };
 
@@ -202,10 +208,12 @@ function saveCurrentTabState() {
     // Get current form values
     tab.stockSymbol = document.getElementById('stockSymbol').value.trim();
     tab.entryPrice = document.getElementById('entryPrice').value;
+    tab.targetPrice = document.getElementById('targetPrice').value;
     tab.quantity = document.getElementById('quantity').value;
     tab.tpPercent = document.getElementById('tpPercent').value;
     tab.slPercent = document.getElementById('slPercent').value;
     tab.autoPriceEnabled = autoPriceEnabled;
+    tab.calculationMode = calculationMode;
 
     // Update tab name in the UI
     saveTabsToStorage();
@@ -220,6 +228,7 @@ function loadTabState(tabId) {
     // Restore form values
     document.getElementById('stockSymbol').value = tab.stockSymbol || '';
     document.getElementById('entryPrice').value = tab.entryPrice || '';
+    document.getElementById('targetPrice').value = tab.targetPrice || '';
     document.getElementById('quantity').value = tab.quantity || '';
     document.getElementById('tpPercent').value = tab.tpPercent || '';
     document.getElementById('slPercent').value = tab.slPercent || '';
@@ -228,6 +237,12 @@ function loadTabState(tabId) {
     if (tab.autoPriceEnabled !== autoPriceEnabled) {
         autoPriceEnabled = tab.autoPriceEnabled;
         updateAutoPriceUI();
+    }
+
+    // Restore calculation mode
+    if (tab.calculationMode) {
+        calculationMode = tab.calculationMode;
+        updateCalculationModeUI();
     }
 
     // Recalculate if we have data
@@ -338,6 +353,42 @@ function loadTheme() {
 
 // Load theme when page loads
 window.addEventListener('DOMContentLoaded', loadTheme);
+
+// ============================================
+// CALCULATION MODE MANAGEMENT
+// ============================================
+
+// Set calculation mode (current or target price)
+function setCalculationMode(mode) {
+    calculationMode = mode;
+    updateCalculationModeUI();
+
+    // Save to current tab
+    if (activeTabId) {
+        saveCurrentTabState();
+    }
+
+    // Recalculate if we have data
+    autoCalculate();
+}
+
+// Update calculation mode UI
+function updateCalculationModeUI() {
+    const currentBtn = document.getElementById('modeCurrentBtn');
+    const targetBtn = document.getElementById('modeTargetBtn');
+
+    if (calculationMode === 'current') {
+        currentBtn.classList.remove('bg-dark-card', 'text-gray-400');
+        currentBtn.classList.add('bg-trading-blue', 'text-white');
+        targetBtn.classList.remove('bg-trading-blue', 'text-white');
+        targetBtn.classList.add('bg-dark-card', 'text-gray-400');
+    } else {
+        targetBtn.classList.remove('bg-dark-card', 'text-gray-400');
+        targetBtn.classList.add('bg-trading-blue', 'text-white');
+        currentBtn.classList.remove('bg-trading-blue', 'text-white');
+        currentBtn.classList.add('bg-dark-card', 'text-gray-400');
+    }
+}
 
 // Toggle Trade Parameters collapsible section (for mobile)
 function toggleTradeParams() {
@@ -582,22 +633,32 @@ setInterval(updateMarketStatus, 1000);
 function calculateTradeLevels() {
 
     // Get input values
-    const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+    const currentPrice = parseFloat(document.getElementById('entryPrice').value);
+    const targetPrice = parseFloat(document.getElementById('targetPrice').value);
     const quantity = parseInt(document.getElementById('quantity').value);
     const tpPercent = parseFloat(document.getElementById('tpPercent').value);
     const slPercent = parseFloat(document.getElementById('slPercent').value);
+
+    // Determine which price to use for calculations based on mode
+    const basePrice = calculationMode === 'target' ? targetPrice : currentPrice;
 
     // Validation
     let isValid = true;
     const errors = {
         entry: '',
+        target: '',
         quantity: '',
         tp: '',
         sl: ''
     };
 
-    if (!entryPrice || entryPrice <= 0) {
-        errors.entry = 'Entry price must be greater than 0';
+    if (!currentPrice || currentPrice <= 0) {
+        errors.entry = 'Current price must be greater than 0';
+        isValid = false;
+    }
+
+    if (calculationMode === 'target' && (!targetPrice || targetPrice <= 0)) {
+        errors.target = 'Target price must be greater than 0';
         isValid = false;
     }
 
@@ -629,22 +690,22 @@ function calculateTradeLevels() {
 
     if (!isValid) return;
 
-    // Calculate prices
-    const tpPrice = entryPrice * (1 + tpPercent / 100);
-    const slPrice = entryPrice * (1 - slPercent / 100);
+    // Calculate prices based on selected mode
+    const tpPrice = basePrice * (1 + tpPercent / 100);
+    const slPrice = basePrice * (1 - slPercent / 100);
 
-    // Calculate amounts
-    const investment = entryPrice * quantity;
-    const maxProfit = (tpPrice - entryPrice) * quantity;
-    const maxLoss = (entryPrice - slPrice) * quantity;
-    const perShareTP = tpPrice - entryPrice;
-    const perShareSL = entryPrice - slPrice;
+    // Calculate amounts using base price (current or target based on mode)
+    const investment = basePrice * quantity;
+    const maxProfit = (tpPrice - basePrice) * quantity;
+    const maxLoss = (basePrice - slPrice) * quantity;
+    const perShareTP = tpPrice - basePrice;
+    const perShareSL = basePrice - slPrice;
 
     // Calculate risk/reward ratio
     const ratio = (maxProfit / maxLoss).toFixed(1);
 
     // Update display with USD values
-    document.getElementById('resultEntry').textContent = '$' + entryPrice.toFixed(2);
+    document.getElementById('resultEntry').textContent = '$' + basePrice.toFixed(2);
     document.getElementById('resultInvestment').textContent = '$' + investment.toFixed(2);
     document.getElementById('resultTP').textContent = '$' + tpPrice.toFixed(2);
     document.getElementById('resultSL').textContent = '$' + slPrice.toFixed(2);
@@ -655,7 +716,7 @@ function calculateTradeLevels() {
     document.getElementById('riskReward').textContent = '1:' + ratio;
 
     // Update display with MYR values
-    document.getElementById('resultEntryMYR').textContent = 'RM ' + (entryPrice * USD_TO_MYR).toFixed(2);
+    document.getElementById('resultEntryMYR').textContent = 'RM ' + (basePrice * USD_TO_MYR).toFixed(2);
     document.getElementById('resultInvestmentMYR').textContent = 'RM ' + (investment * USD_TO_MYR).toFixed(2);
     document.getElementById('resultTPMYR').textContent = 'RM ' + (tpPrice * USD_TO_MYR).toFixed(2);
     document.getElementById('resultSLMYR').textContent = 'RM ' + (slPrice * USD_TO_MYR).toFixed(2);
@@ -765,19 +826,23 @@ Risk/Reward Ratio: 1:${ratio}
 
 // Auto-calculate on input change
 function autoCalculate() {
-    const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+    const currentPrice = parseFloat(document.getElementById('entryPrice').value);
+    const targetPrice = parseFloat(document.getElementById('targetPrice').value);
     const quantity = parseInt(document.getElementById('quantity').value);
-    const tpPercent = parseFloat(document.getElementById('tpPercent').value);
-    const slPercent = parseFloat(document.getElementById('slPercent').value);
 
-    // Only auto-calculate if we have at least entry price and quantity
-    if (entryPrice && entryPrice > 0 && quantity && quantity > 0) {
+    // Only auto-calculate if we have at least the required price and quantity
+    if (currentPrice && currentPrice > 0 && quantity && quantity > 0) {
+        // In target mode, also need target price
+        if (calculationMode === 'target' && (!targetPrice || targetPrice <= 0)) {
+            return;
+        }
         calculateTradeLevels();
     }
 }
 
 // Add event listeners to all input fields
 document.getElementById('entryPrice').addEventListener('input', autoCalculate);
+document.getElementById('targetPrice').addEventListener('input', autoCalculate);
 document.getElementById('quantity').addEventListener('input', autoCalculate);
 document.getElementById('tpPercent').addEventListener('input', autoCalculate);
 document.getElementById('slPercent').addEventListener('input', autoCalculate);
