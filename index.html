@@ -291,6 +291,14 @@
                                     >
                                 </div>
                                 <div id="targetError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                <!-- Percentage Difference Display -->
+                                <div id="priceDifference" class="hidden mt-2 text-xs font-semibold flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path id="arrowIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                    </svg>
+                                    <span id="percentChange">0.00%</span>
+                                    <span id="changeLabel" class="text-gray-400">from target</span>
+                                </div>
                             </div>
                         </div>
 

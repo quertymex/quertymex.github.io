@@ -8,6 +8,10 @@ let activeTabId = null;
 const MAX_TABS = 20; // Maximum number of tabs allowed
 let calculationMode = 'current'; // 'current' or 'target'
 
+// Drag and drop state
+let draggedTabId = null;
+let draggedOverTabId = null;
+
 // Initialize tab system on page load
 function initTabSystem() {
     // Load tabs from localStorage or create first tab
@@ -30,6 +34,12 @@ function initTabSystem() {
 
     // Initialize calculation mode UI
     updateCalculationModeUI();
+
+    // Start auto-fetch interval if any tabs have auto-price enabled
+    // Use setTimeout to ensure it runs after page is fully loaded
+    setTimeout(() => {
+        checkAutoFetchInterval();
+    }, 1000);
 }
 
 // Generate unique tab ID
@@ -90,6 +100,7 @@ function createTabElement(tab) {
     const tabDiv = document.createElement('div');
     tabDiv.className = `stock-tab tab-slide-in ${tab.id === activeTabId ? 'active' : ''}`;
     tabDiv.setAttribute('data-tab-id', tab.id);
+    tabDiv.setAttribute('draggable', 'true');
 
     // Display stock symbol if available, otherwise show tab number
     const tabIndex = tabs.findIndex(t => t.id === tab.id) + 1;
@@ -115,6 +126,14 @@ function createTabElement(tab) {
             switchTab(tab.id);
         }
     });
+
+    // Add drag event handlers
+    tabDiv.addEventListener('dragstart', handleDragStart);
+    tabDiv.addEventListener('dragover', handleDragOver);
+    tabDiv.addEventListener('drop', handleDrop);
+    tabDiv.addEventListener('dragenter', handleDragEnter);
+    tabDiv.addEventListener('dragleave', handleDragLeave);
+    tabDiv.addEventListener('dragend', handleDragEnd);
 
     return tabDiv;
 }
@@ -171,7 +190,161 @@ function closeTab(event, tabId) {
     // Save and render
     saveTabsToStorage();
     renderTabs();
+
+    // Check if we need to stop auto-fetch interval (if no tabs have auto-price)
+    checkAutoFetchInterval();
 }
+
+// ============================================
+// TAB DRAG AND DROP HANDLERS
+// ============================================
+
+function handleDragStart(e) {
+    const tabElement = e.target.closest('.stock-tab');
+    if (!tabElement) return;
+
+    draggedTabId = tabElement.getAttribute('data-tab-id');
+    tabElement.classList.add('dragging');
+
+    // Set drag data
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', tabElement.innerHTML);
+}
+
+function handleDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary to allow drop
+    }
+
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function handleDragEnter(e) {
+    const tabElement = e.target.closest('.stock-tab');
+    if (!tabElement) return;
+
+    const tabId = tabElement.getAttribute('data-tab-id');
+
+    // Don't add class to the dragged element itself
+    if (tabId !== draggedTabId) {
+        tabElement.classList.add('drag-over');
+        draggedOverTabId = tabId;
+    }
+}
+
+function handleDragLeave(e) {
+    const tabElement = e.target.closest('.stock-tab');
+    if (!tabElement) return;
+
+    tabElement.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    if (e.stopPropagation) {
+        e.stopPropagation(); // Stops some browsers from redirecting
+    }
+
+    const dropTarget = e.target.closest('.stock-tab');
+    if (!dropTarget) return;
+
+    const dropTabId = dropTarget.getAttribute('data-tab-id');
+
+    // Don't do anything if dropping on itself
+    if (draggedTabId !== dropTabId) {
+        // Reorder tabs
+        reorderTabs(draggedTabId, dropTabId);
+    }
+
+    return false;
+}
+
+function handleDragEnd(e) {
+    const tabElement = e.target.closest('.stock-tab');
+    if (tabElement) {
+        tabElement.classList.remove('dragging');
+    }
+
+    // Remove drag-over class from all tabs
+    document.querySelectorAll('.stock-tab').forEach(tab => {
+        tab.classList.remove('drag-over');
+    });
+
+    draggedTabId = null;
+    draggedOverTabId = null;
+}
+
+function reorderTabs(draggedId, dropTargetId) {
+    // Find indices
+    const draggedIndex = tabs.findIndex(t => t.id === draggedId);
+    const dropIndex = tabs.findIndex(t => t.id === dropTargetId);
+
+    if (draggedIndex === -1 || dropIndex === -1) return;
+
+    // Remove dragged tab from its position
+    const [draggedTab] = tabs.splice(draggedIndex, 1);
+
+    // Insert it at the new position
+    tabs.splice(dropIndex, 0, draggedTab);
+
+    // Save and re-render
+    saveTabsToStorage();
+    renderTabs();
+
+    console.log('Tabs reordered');
+}
+
+// ============================================
+// TAB KEYBOARD NAVIGATION
+// ============================================
+
+// Switch to next tab (right arrow)
+function switchToNextTab() {
+    if (tabs.length <= 1) return;
+
+    const currentIndex = tabs.findIndex(t => t.id === activeTabId);
+    if (currentIndex === -1) return;
+
+    // Move to next tab, or wrap to first tab
+    const nextIndex = (currentIndex + 1) % tabs.length;
+    const nextTabId = tabs[nextIndex].id;
+
+    switchTab(nextTabId);
+}
+
+// Switch to previous tab (left arrow)
+function switchToPrevTab() {
+    if (tabs.length <= 1) return;
+
+    const currentIndex = tabs.findIndex(t => t.id === activeTabId);
+    if (currentIndex === -1) return;
+
+    // Move to previous tab, or wrap to last tab
+    const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1;
+    const prevTabId = tabs[prevIndex].id;
+
+    switchTab(prevTabId);
+}
+
+// Add keyboard event listener for arrow key navigation
+document.addEventListener('keydown', function(e) {
+    // Only handle arrow keys when not typing in an input field
+    const activeElement = document.activeElement;
+    const isInputFocused = activeElement.tagName === 'INPUT' ||
+                          activeElement.tagName === 'TEXTAREA' ||
+                          activeElement.isContentEditable;
+
+    // If user is typing, don't intercept arrow keys
+    if (isInputFocused) return;
+
+    if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        switchToNextTab();
+    } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        switchToPrevTab();
+    }
+});
 
 // Clear all tabs
 function clearAllTabs() {
@@ -306,6 +479,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Save current tab state which will update the tab name
             if (activeTabId) {
                 saveCurrentTabState();
+                // Check if we need to start auto-fetch interval
+                checkAutoFetchInterval();
             }
         });
     }
@@ -824,11 +999,55 @@ Risk/Reward Ratio: 1:${ratio}
     });
 }
 
+// Calculate and display price difference percentage
+function calculatePriceDifference() {
+    const currentPrice = parseFloat(document.getElementById('entryPrice').value);
+    const targetPrice = parseFloat(document.getElementById('targetPrice').value);
+
+    const priceDiffElement = document.getElementById('priceDifference');
+    const percentChangeElement = document.getElementById('percentChange');
+    const arrowIcon = document.getElementById('arrowIcon');
+
+    // Hide if either price is missing or invalid
+    if (!currentPrice || currentPrice <= 0 || !targetPrice || targetPrice <= 0) {
+        priceDiffElement.classList.add('hidden');
+        return;
+    }
+
+    // Calculate percentage difference: ((current - target) / target) * 100
+    // Positive = current is above target, Negative = current is below target
+    const percentDiff = ((currentPrice - targetPrice) / targetPrice) * 100;
+    const isPositive = percentDiff >= 0;
+
+    // Update the percentage text
+    const sign = isPositive ? '+' : '';
+    percentChangeElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
+
+    // Update colors and arrow direction
+    if (isPositive) {
+        // Positive change (green/up) - current is above target
+        priceDiffElement.className = 'mt-2 text-xs font-semibold flex items-center gap-1 text-trading-up';
+        // Up arrow
+        arrowIcon.setAttribute('d', 'M5 10l7-7m0 0l7 7m-7-7v18');
+    } else {
+        // Negative change (red/down) - current is below target
+        priceDiffElement.className = 'mt-2 text-xs font-semibold flex items-center gap-1 text-trading-down';
+        // Down arrow
+        arrowIcon.setAttribute('d', 'M19 14l-7 7m0 0l-7-7m7 7V3');
+    }
+
+    // Show the element
+    priceDiffElement.classList.remove('hidden');
+}
+
 // Auto-calculate on input change
 function autoCalculate() {
     const currentPrice = parseFloat(document.getElementById('entryPrice').value);
     const targetPrice = parseFloat(document.getElementById('targetPrice').value);
     const quantity = parseInt(document.getElementById('quantity').value);
+
+    // Calculate price difference percentage
+    calculatePriceDifference();
 
     // Only auto-calculate if we have at least the required price and quantity
     if (currentPrice && currentPrice > 0 && quantity && quantity > 0) {
@@ -861,6 +1080,10 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
 // Auto-Price Toggle Functionality
 let autoPriceEnabled = false;
 const PRICE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const AUTO_FETCH_INTERVAL = 5 * 60 * 1000; // Fetch every 5 minutes
+
+// Global interval for auto-fetching prices
+let autoFetchIntervalId = null;
 
 function toggleAutoPrice() {
     autoPriceEnabled = !autoPriceEnabled;
@@ -894,6 +1117,9 @@ function toggleAutoPrice() {
     if (activeTabId) {
         saveCurrentTabState();
     }
+
+    // Check if we need to start/stop the auto-fetch interval
+    checkAutoFetchInterval();
 }
 
 // Note: loadAutoPriceState removed - now handled per-tab in loadTabState()
@@ -1046,6 +1272,168 @@ function cachePrice(symbol, price) {
     };
 
     localStorage.setItem(cacheKey, JSON.stringify(data));
+}
+
+// ============================================
+// AUTO-FETCH INTERVAL FOR ALL TABS
+// ============================================
+
+// Fetch prices for all tabs with auto-price enabled
+async function fetchPricesForAllTabs() {
+    console.log('Auto-fetching prices for all tabs...');
+
+    // Get all tabs with auto-price enabled and a stock symbol
+    const tabsToUpdate = tabs.filter(tab => tab.autoPriceEnabled && tab.stockSymbol);
+
+    if (tabsToUpdate.length === 0) {
+        console.log('No tabs with auto-price enabled');
+        return;
+    }
+
+    console.log(`Fetching prices for ${tabsToUpdate.length} tab(s)`);
+
+    // Fetch prices for each tab
+    for (const tab of tabsToUpdate) {
+        try {
+            const symbol = tab.stockSymbol.trim().toUpperCase();
+            if (!symbol) continue;
+
+            console.log(`Fetching price for ${symbol} (tab: ${tab.id})`);
+
+            // Check cache first - but force refresh if cache is old
+            let currentPrice = null;
+
+            // Try Yahoo Finance via CORS proxy
+            try {
+                const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
+                const corsProxy = 'https://api.allorigins.win/raw?url=';
+                const response = await fetch(corsProxy + encodeURIComponent(yahooUrl));
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.chart && data.chart.result && data.chart.result[0]) {
+                        const result = data.chart.result[0];
+                        const meta = result.meta;
+                        if (meta.regularMarketPrice) {
+                            currentPrice = meta.regularMarketPrice;
+                            console.log(`Fetched ${symbol} from Yahoo Finance:`, currentPrice);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log(`Yahoo Finance failed for ${symbol}, trying alternative...`, e);
+            }
+
+            // Method 2: Try Finnhub API (free tier with demo key)
+            if (!currentPrice) {
+                try {
+                    const finnhubKey = 'ctguukhr01ql2bu46te0ctguukhr01ql2bu46teg';
+                    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.c && data.c > 0) {
+                            currentPrice = data.c;
+                            console.log(`Fetched ${symbol} from Finnhub:`, currentPrice);
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Finnhub failed for ${symbol}, trying alternative...`, e);
+                }
+            }
+
+            // Method 3: Try Twelve Data API
+            if (!currentPrice) {
+                try {
+                    const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=demo`);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.price && !isNaN(parseFloat(data.price))) {
+                            currentPrice = parseFloat(data.price);
+                            console.log(`Fetched ${symbol} from Twelve Data:`, currentPrice);
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Twelve Data failed for ${symbol}`, e);
+                }
+            }
+
+            if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
+                // Cache the new price
+                cachePrice(symbol, currentPrice);
+
+                // Update the tab's entry price
+                tab.entryPrice = currentPrice.toFixed(2);
+
+                // If this is the active tab, update the UI
+                if (tab.id === activeTabId) {
+                    document.getElementById('entryPrice').value = currentPrice.toFixed(2);
+                    // Trigger auto-calculation
+                    autoCalculate();
+                }
+
+                console.log(`✓ Updated ${symbol} price to $${currentPrice.toFixed(2)}`);
+            } else {
+                console.warn(`Failed to fetch price for ${symbol}`);
+            }
+        } catch (error) {
+            console.error(`Error fetching price for ${tab.stockSymbol}:`, error);
+        }
+
+        // Add a small delay between requests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+
+    // Save updated tabs to storage
+    saveTabsToStorage();
+
+    console.log('Auto-fetch completed');
+}
+
+// Start auto-fetch interval
+function startAutoFetchInterval() {
+    // Clear any existing interval first
+    if (autoFetchIntervalId) {
+        clearInterval(autoFetchIntervalId);
+    }
+
+    // Check if any tabs have auto-price enabled
+    const hasAutoPrice = tabs.some(tab => tab.autoPriceEnabled && tab.stockSymbol);
+
+    if (hasAutoPrice) {
+        console.log('Starting auto-fetch interval (every 5 minutes)');
+
+        // Fetch immediately
+        fetchPricesForAllTabs();
+
+        // Set up interval to fetch every 5 minutes
+        autoFetchIntervalId = setInterval(() => {
+            fetchPricesForAllTabs();
+        }, AUTO_FETCH_INTERVAL);
+    }
+}
+
+// Stop auto-fetch interval
+function stopAutoFetchInterval() {
+    if (autoFetchIntervalId) {
+        console.log('Stopping auto-fetch interval');
+        clearInterval(autoFetchIntervalId);
+        autoFetchIntervalId = null;
+    }
+}
+
+// Check if we should run the auto-fetch interval
+function checkAutoFetchInterval() {
+    const hasAutoPrice = tabs.some(tab => tab.autoPriceEnabled && tab.stockSymbol);
+
+    if (hasAutoPrice && !autoFetchIntervalId) {
+        // Start interval if we have tabs with auto-price but no interval running
+        startAutoFetchInterval();
+    } else if (!hasAutoPrice && autoFetchIntervalId) {
+        // Stop interval if no tabs have auto-price enabled
+        stopAutoFetchInterval();
+    }
 }
 
 // Listen for stock symbol changes

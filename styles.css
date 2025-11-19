@@ -332,10 +332,11 @@ input[type="number"] {
     color: var(--text-muted);
     font-size: 0.875rem;
     font-weight: 500;
-    cursor: pointer;
+    cursor: move;
     transition: all 200ms ease;
     white-space: nowrap;
     border-radius: 0.375rem;
+    user-select: none;
 }
 
 .stock-tab::after {
@@ -410,6 +411,19 @@ body.light-mode .tab-close:hover {
 
 .tab-slide-in {
     animation: tabSlideIn 200ms ease-out;
+}
+
+/* Tab drag and drop styles */
+.stock-tab.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    cursor: grabbing;
+}
+
+.stock-tab.drag-over {
+    border-left: 2px solid #2962FF;
+    padding-left: calc(1rem - 2px);
+    background-color: var(--bg-hover);
 }
 
 /* Scrollbar for tabs container */
