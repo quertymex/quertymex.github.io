@@ -35,11 +35,8 @@ function initTabSystem() {
     // Initialize calculation mode UI
     updateCalculationModeUI();
 
-    // Start auto-fetch interval if any tabs have auto-price enabled
-    // Use setTimeout to ensure it runs after page is fully loaded
-    setTimeout(() => {
-        checkAutoFetchInterval();
-    }, 1000);
+    // Immediately fetch prices for all tabs with auto-price enabled on page load
+    checkAutoFetchInterval();
 }
 
 // Generate unique tab ID
@@ -154,6 +151,9 @@ function switchTab(tabId) {
     // Update UI
     renderTabs();
     loadTabState(tabId);
+
+    // Check and restart auto-fetch interval for the new active tab
+    checkAutoFetchInterval();
 }
 
 // Close tab
@@ -979,12 +979,15 @@ ${title}
 ═══════════════
 📅 ${dateStr} • ${timeStr}
 💰 Entry Price: $${entryPrice.toFixed(2)} (RM ${entryMYR.toFixed(2)})
+   📌 Set Limit (BUY)
 📦 Quantity: ${quantity} shares
 💵 Total Cost: $${investment.toFixed(2)} (RM ${investmentMYR.toFixed(2)})
 ═══════════════
 🎯 TAKE PROFIT: $${tpPrice.toFixed(2)} (RM ${tpMYR.toFixed(2)})
+   📌 Limit if Touched (TP)
    ↗️ +${tpPercent}% gain = +$${maxProfit.toFixed(2)} (+RM ${maxProfitMYR.toFixed(2)})
 🛑 STOP LOSS: $${slPrice.toFixed(2)} (RM ${slMYR.toFixed(2)})
+   📌 Stop Limit (SL)
    ↘️ -${slPercent}% loss = -$${maxLoss.toFixed(2)} (-RM ${maxLossMYR.toFixed(2)})
 ═══════════════
 Risk/Reward Ratio: 1:${ratio}
@@ -1079,10 +1082,10 @@ document.querySelectorAll('input[type="number"]').forEach(input => {
 
 // Auto-Price Toggle Functionality
 let autoPriceEnabled = false;
-const PRICE_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-const AUTO_FETCH_INTERVAL = 5 * 60 * 1000; // Fetch every 5 minutes
+const PRICE_CACHE_DURATION = 1 * 60 * 1000; // 1 minute in milliseconds
+const AUTO_FETCH_INTERVAL = 1 * 60 * 1000; // Fetch every 1 minute for active tab only
 
-// Global interval for auto-fetching prices
+// Global interval for auto-fetching price (active tab only)
 let autoFetchIntervalId = null;
 
 function toggleAutoPrice() {
@@ -1146,61 +1149,20 @@ async function fetchStockPrice(symbol) {
 
         let currentPrice = null;
 
-        // Method 1: Try Yahoo Finance via CORS proxy
+        // Fetch from Finnhub API
         try {
-            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${upperSymbol}`;
-            const corsProxy = 'https://api.allorigins.win/raw?url=';
-            const response1 = await fetch(corsProxy + encodeURIComponent(yahooUrl));
+            const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10'; // Your API key
+            const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${upperSymbol}&token=${finnhubKey}`);
 
-            if (response1.ok) {
-                const data1 = await response1.json();
-                if (data1.chart && data1.chart.result && data1.chart.result[0]) {
-                    const result = data1.chart.result[0];
-                    const meta = result.meta;
-                    if (meta.regularMarketPrice) {
-                        currentPrice = meta.regularMarketPrice;
-                        console.log('Fetched from Yahoo Finance:', currentPrice);
-                    }
+            if (response.ok) {
+                const data = await response.json();
+                if (data.c && data.c > 0) {
+                    currentPrice = data.c; // Current price
+                    console.log('Fetched from Finnhub:', currentPrice);
                 }
             }
         } catch (e) {
-            console.log('Yahoo Finance failed, trying alternative...', e);
-        }
-
-        // Method 2: Try Finnhub API (free tier with demo key)
-        if (!currentPrice) {
-            try {
-                // Get a free API key at https://finnhub.io (60 calls/minute free)
-                const finnhubKey = 'ctguukhr01ql2bu46te0ctguukhr01ql2bu46teg'; // Demo key
-                const response2 = await fetch(`https://finnhub.io/api/v1/quote?symbol=${upperSymbol}&token=${finnhubKey}`);
-
-                if (response2.ok) {
-                    const data2 = await response2.json();
-                    if (data2.c && data2.c > 0) {
-                        currentPrice = data2.c; // Current price
-                        console.log('Fetched from Finnhub:', currentPrice);
-                    }
-                }
-            } catch (e) {
-                console.log('Finnhub failed, trying alternative...', e);
-            }
-        }
-
-        // Method 3: Try Twelve Data API
-        if (!currentPrice) {
-            try {
-                const response3 = await fetch(`https://api.twelvedata.com/price?symbol=${upperSymbol}&apikey=demo`);
-
-                if (response3.ok) {
-                    const data3 = await response3.json();
-                    if (data3.price && !isNaN(parseFloat(data3.price))) {
-                        currentPrice = parseFloat(data3.price);
-                        console.log('Fetched from Twelve Data:', currentPrice);
-                    }
-                }
-            } catch (e) {
-                console.log('Twelve Data failed', e);
-            }
+            console.log('Finnhub API error:', e);
         }
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
@@ -1275,120 +1237,72 @@ function cachePrice(symbol, price) {
 }
 
 // ============================================
-// AUTO-FETCH INTERVAL FOR ALL TABS
+// AUTO-FETCH INTERVAL FOR ACTIVE TAB ONLY
 // ============================================
 
-// Fetch prices for all tabs with auto-price enabled
-async function fetchPricesForAllTabs() {
-    console.log('Auto-fetching prices for all tabs...');
+// Fetch price for the active tab only
+async function fetchPriceForActiveTab() {
+    // Get the active tab
+    const activeTab = tabs.find(t => t.id === activeTabId);
 
-    // Get all tabs with auto-price enabled and a stock symbol
-    const tabsToUpdate = tabs.filter(tab => tab.autoPriceEnabled && tab.stockSymbol);
-
-    if (tabsToUpdate.length === 0) {
-        console.log('No tabs with auto-price enabled');
+    if (!activeTab) {
+        console.log('No active tab found');
         return;
     }
 
-    console.log(`Fetching prices for ${tabsToUpdate.length} tab(s)`);
-
-    // Fetch prices for each tab
-    for (const tab of tabsToUpdate) {
-        try {
-            const symbol = tab.stockSymbol.trim().toUpperCase();
-            if (!symbol) continue;
-
-            console.log(`Fetching price for ${symbol} (tab: ${tab.id})`);
-
-            // Check cache first - but force refresh if cache is old
-            let currentPrice = null;
-
-            // Try Yahoo Finance via CORS proxy
-            try {
-                const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`;
-                const corsProxy = 'https://api.allorigins.win/raw?url=';
-                const response = await fetch(corsProxy + encodeURIComponent(yahooUrl));
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.chart && data.chart.result && data.chart.result[0]) {
-                        const result = data.chart.result[0];
-                        const meta = result.meta;
-                        if (meta.regularMarketPrice) {
-                            currentPrice = meta.regularMarketPrice;
-                            console.log(`Fetched ${symbol} from Yahoo Finance:`, currentPrice);
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log(`Yahoo Finance failed for ${symbol}, trying alternative...`, e);
-            }
-
-            // Method 2: Try Finnhub API (free tier with demo key)
-            if (!currentPrice) {
-                try {
-                    const finnhubKey = 'ctguukhr01ql2bu46te0ctguukhr01ql2bu46teg';
-                    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.c && data.c > 0) {
-                            currentPrice = data.c;
-                            console.log(`Fetched ${symbol} from Finnhub:`, currentPrice);
-                        }
-                    }
-                } catch (e) {
-                    console.log(`Finnhub failed for ${symbol}, trying alternative...`, e);
-                }
-            }
-
-            // Method 3: Try Twelve Data API
-            if (!currentPrice) {
-                try {
-                    const response = await fetch(`https://api.twelvedata.com/price?symbol=${symbol}&apikey=demo`);
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.price && !isNaN(parseFloat(data.price))) {
-                            currentPrice = parseFloat(data.price);
-                            console.log(`Fetched ${symbol} from Twelve Data:`, currentPrice);
-                        }
-                    }
-                } catch (e) {
-                    console.log(`Twelve Data failed for ${symbol}`, e);
-                }
-            }
-
-            if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
-                // Cache the new price
-                cachePrice(symbol, currentPrice);
-
-                // Update the tab's entry price
-                tab.entryPrice = currentPrice.toFixed(2);
-
-                // If this is the active tab, update the UI
-                if (tab.id === activeTabId) {
-                    document.getElementById('entryPrice').value = currentPrice.toFixed(2);
-                    // Trigger auto-calculation
-                    autoCalculate();
-                }
-
-                console.log(`✓ Updated ${symbol} price to $${currentPrice.toFixed(2)}`);
-            } else {
-                console.warn(`Failed to fetch price for ${symbol}`);
-            }
-        } catch (error) {
-            console.error(`Error fetching price for ${tab.stockSymbol}:`, error);
-        }
-
-        // Add a small delay between requests to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 300));
+    // Check if auto-price is enabled and symbol exists
+    if (!activeTab.autoPriceEnabled || !activeTab.stockSymbol) {
+        console.log('Active tab does not have auto-price enabled or no symbol');
+        return;
     }
 
-    // Save updated tabs to storage
-    saveTabsToStorage();
+    const symbol = activeTab.stockSymbol.trim().toUpperCase();
+    if (!symbol) return;
 
-    console.log('Auto-fetch completed');
+    console.log(`Auto-fetching price for active tab: ${symbol}`);
+
+    try {
+        // Fetch from Finnhub API
+        let currentPrice = null;
+
+        try {
+            const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10';
+            const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.c && data.c > 0) {
+                    currentPrice = data.c;
+                    console.log(`Fetched ${symbol} from Finnhub:`, currentPrice);
+                }
+            }
+        } catch (e) {
+            console.log(`Finnhub API error for ${symbol}:`, e);
+        }
+
+        if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
+            // Cache the new price
+            cachePrice(symbol, currentPrice);
+
+            // Update the active tab's entry price
+            activeTab.entryPrice = currentPrice.toFixed(2);
+
+            // Update the UI
+            document.getElementById('entryPrice').value = currentPrice.toFixed(2);
+
+            // Trigger auto-calculation
+            autoCalculate();
+
+            // Save updated tabs to storage
+            saveTabsToStorage();
+
+            console.log(`✓ Updated ${symbol} price to $${currentPrice.toFixed(2)}`);
+        } else {
+            console.warn(`Failed to fetch price for ${symbol}`);
+        }
+    } catch (error) {
+        console.error(`Error fetching price for ${symbol}:`, error);
+    }
 }
 
 // Start auto-fetch interval
@@ -1398,18 +1312,19 @@ function startAutoFetchInterval() {
         clearInterval(autoFetchIntervalId);
     }
 
-    // Check if any tabs have auto-price enabled
-    const hasAutoPrice = tabs.some(tab => tab.autoPriceEnabled && tab.stockSymbol);
+    // Check if active tab has auto-price enabled
+    const activeTab = tabs.find(t => t.id === activeTabId);
+    const hasAutoPrice = activeTab && activeTab.autoPriceEnabled && activeTab.stockSymbol;
 
     if (hasAutoPrice) {
-        console.log('Starting auto-fetch interval (every 5 minutes)');
+        console.log('Starting auto-fetch interval for active tab (every 1 minute)');
 
-        // Fetch immediately
-        fetchPricesForAllTabs();
+        // Fetch immediately for active tab
+        fetchPriceForActiveTab();
 
-        // Set up interval to fetch every 5 minutes
+        // Set up interval to fetch every 1 minute for active tab only
         autoFetchIntervalId = setInterval(() => {
-            fetchPricesForAllTabs();
+            fetchPriceForActiveTab();
         }, AUTO_FETCH_INTERVAL);
     }
 }
@@ -1425,14 +1340,18 @@ function stopAutoFetchInterval() {
 
 // Check if we should run the auto-fetch interval
 function checkAutoFetchInterval() {
-    const hasAutoPrice = tabs.some(tab => tab.autoPriceEnabled && tab.stockSymbol);
+    const activeTab = tabs.find(t => t.id === activeTabId);
+    const hasAutoPrice = activeTab && activeTab.autoPriceEnabled && activeTab.stockSymbol;
 
     if (hasAutoPrice && !autoFetchIntervalId) {
-        // Start interval if we have tabs with auto-price but no interval running
+        // Start interval if active tab has auto-price but no interval running
         startAutoFetchInterval();
     } else if (!hasAutoPrice && autoFetchIntervalId) {
-        // Stop interval if no tabs have auto-price enabled
+        // Stop interval if active tab doesn't have auto-price enabled
         stopAutoFetchInterval();
+    } else if (hasAutoPrice && autoFetchIntervalId) {
+        // Restart interval to fetch for the new active tab immediately
+        startAutoFetchInterval();
     }
 }
 
