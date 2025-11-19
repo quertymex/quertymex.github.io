@@ -1139,6 +1139,7 @@ async function fetchStockPrice(symbol) {
     if (cachedData) {
         console.log('Using cached price for', upperSymbol, ':', cachedData.price);
         entryPriceInput.value = cachedData.price.toFixed(2);
+        updatePriceChangeDisplay(cachedData.percentChange);
         entryPriceInput.dispatchEvent(new Event('input'));
         return;
     }
@@ -1150,6 +1151,7 @@ async function fetchStockPrice(symbol) {
         let currentPrice = null;
 
         // Fetch from Finnhub API
+        let percentChange = null;
         try {
             const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10'; // Your API key
             const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${upperSymbol}&token=${finnhubKey}`);
@@ -1158,7 +1160,8 @@ async function fetchStockPrice(symbol) {
                 const data = await response.json();
                 if (data.c && data.c > 0) {
                     currentPrice = data.c; // Current price
-                    console.log('Fetched from Finnhub:', currentPrice);
+                    percentChange = data.dp; // Percent change
+                    console.log('Fetched from Finnhub:', currentPrice, `(${percentChange}%)`);
                 }
             }
         } catch (e) {
@@ -1166,12 +1169,15 @@ async function fetchStockPrice(symbol) {
         }
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
-            // Cache the price
-            cachePrice(upperSymbol, currentPrice);
+            // Cache the price with percent change
+            cachePrice(upperSymbol, currentPrice, percentChange);
 
             // Update entry price
             entryPriceInput.value = currentPrice.toFixed(2);
             entryPriceInput.placeholder = '0.00';
+
+            // Update percent change display
+            updatePriceChangeDisplay(percentChange);
 
             // Trigger auto-calculation
             entryPriceInput.dispatchEvent(new Event('input'));
@@ -1204,6 +1210,32 @@ async function fetchStockPrice(symbol) {
     }
 }
 
+// Update price change percentage display
+function updatePriceChangeDisplay(percentChange) {
+    const priceChangeContainer = document.getElementById('priceChangeContainer');
+    const priceChangeElement = document.getElementById('priceChangePercent');
+
+    if (percentChange !== null && !isNaN(percentChange)) {
+        const sign = percentChange >= 0 ? '+' : '';
+        priceChangeElement.textContent = `${sign}${percentChange.toFixed(2)}%`;
+
+        // Set color based on positive/negative
+        if (percentChange >= 0) {
+            priceChangeElement.className = 'text-xs font-semibold text-trading-up';
+        } else {
+            priceChangeElement.className = 'text-xs font-semibold text-trading-down';
+        }
+
+        // Show the container
+        priceChangeContainer.classList.remove('hidden');
+        priceChangeContainer.classList.add('flex');
+    } else {
+        // Hide the container
+        priceChangeContainer.classList.remove('flex');
+        priceChangeContainer.classList.add('hidden');
+    }
+}
+
 // Cache management
 function getCachedPrice(symbol) {
     const cacheKey = `stockPrice_${symbol}`;
@@ -1225,11 +1257,12 @@ function getCachedPrice(symbol) {
     return null;
 }
 
-function cachePrice(symbol, price) {
+function cachePrice(symbol, price, percentChange = null) {
     const cacheKey = `stockPrice_${symbol}`;
     const data = {
         symbol: symbol,
         price: price,
+        percentChange: percentChange,
         timestamp: Date.now()
     };
 
@@ -1264,6 +1297,7 @@ async function fetchPriceForActiveTab() {
     try {
         // Fetch from Finnhub API
         let currentPrice = null;
+        let percentChange = null;
 
         try {
             const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10';
@@ -1273,7 +1307,8 @@ async function fetchPriceForActiveTab() {
                 const data = await response.json();
                 if (data.c && data.c > 0) {
                     currentPrice = data.c;
-                    console.log(`Fetched ${symbol} from Finnhub:`, currentPrice);
+                    percentChange = data.dp; // Percent change
+                    console.log(`Fetched ${symbol} from Finnhub:`, currentPrice, `(${percentChange}%)`);
                 }
             }
         } catch (e) {
@@ -1281,14 +1316,17 @@ async function fetchPriceForActiveTab() {
         }
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
-            // Cache the new price
-            cachePrice(symbol, currentPrice);
+            // Cache the new price with percent change
+            cachePrice(symbol, currentPrice, percentChange);
 
             // Update the active tab's entry price
             activeTab.entryPrice = currentPrice.toFixed(2);
 
             // Update the UI
             document.getElementById('entryPrice').value = currentPrice.toFixed(2);
+
+            // Update percent change display
+            updatePriceChangeDisplay(percentChange);
 
             // Trigger auto-calculation
             autoCalculate();
