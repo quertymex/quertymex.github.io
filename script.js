@@ -374,7 +374,15 @@ function clearAllTabs() {
 }
 
 // Save current tab state
+let isLoadingTabState = false; // Flag to prevent saving during load
+let saveDebounceTimer = null; // Debounce timer for saving
+
 function saveCurrentTabState() {
+    // Don't save if we're currently loading tab state
+    if (isLoadingTabState) {
+        return;
+    }
+
     const tab = tabs.find(t => t.id === activeTabId);
     if (!tab) return;
 
@@ -393,10 +401,31 @@ function saveCurrentTabState() {
     renderTabs();
 }
 
+// Debounced version of saveCurrentTabState for input events
+function debouncedSaveTabState() {
+    // Don't save if we're currently loading tab state
+    if (isLoadingTabState) {
+        return;
+    }
+
+    // Clear existing timer
+    if (saveDebounceTimer) {
+        clearTimeout(saveDebounceTimer);
+    }
+
+    // Set new timer to save after 300ms of no activity
+    saveDebounceTimer = setTimeout(() => {
+        saveCurrentTabState();
+    }, 300);
+}
+
 // Load tab state into form
 function loadTabState(tabId) {
     const tab = tabs.find(t => t.id === tabId);
     if (!tab) return;
+
+    // Set flag to prevent saving during load
+    isLoadingTabState = true;
 
     // Restore form values
     document.getElementById('stockSymbol').value = tab.stockSymbol || '';
@@ -426,6 +455,11 @@ function loadTabState(tabId) {
         document.getElementById('results').classList.remove('result-active');
         document.getElementById('results').classList.add('result-inactive');
     }
+
+    // Clear the loading flag after a short delay to ensure all events have processed
+    setTimeout(() => {
+        isLoadingTabState = false;
+    }, 100);
 }
 
 // Clear calculator form
@@ -476,9 +510,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const stockSymbolInput = document.getElementById('stockSymbol');
     if (stockSymbolInput) {
         stockSymbolInput.addEventListener('input', function () {
-            // Save current tab state which will update the tab name
+            // Use debounced save to prevent race conditions during load
             if (activeTabId) {
-                saveCurrentTabState();
+                debouncedSaveTabState();
                 // Check if we need to start auto-fetch interval
                 checkAutoFetchInterval();
             }
@@ -1063,11 +1097,26 @@ function autoCalculate() {
 }
 
 // Add event listeners to all input fields
-document.getElementById('entryPrice').addEventListener('input', autoCalculate);
-document.getElementById('targetPrice').addEventListener('input', autoCalculate);
-document.getElementById('quantity').addEventListener('input', autoCalculate);
-document.getElementById('tpPercent').addEventListener('input', autoCalculate);
-document.getElementById('slPercent').addEventListener('input', autoCalculate);
+document.getElementById('entryPrice').addEventListener('input', function () {
+    autoCalculate();
+    debouncedSaveTabState();
+});
+document.getElementById('targetPrice').addEventListener('input', function () {
+    autoCalculate();
+    debouncedSaveTabState();
+});
+document.getElementById('quantity').addEventListener('input', function () {
+    autoCalculate();
+    debouncedSaveTabState();
+});
+document.getElementById('tpPercent').addEventListener('input', function () {
+    autoCalculate();
+    debouncedSaveTabState();
+});
+document.getElementById('slPercent').addEventListener('input', function () {
+    autoCalculate();
+    debouncedSaveTabState();
+});
 
 // Clear error on input
 document.querySelectorAll('input[type="number"]').forEach(input => {
