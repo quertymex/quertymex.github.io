@@ -26,16 +26,45 @@ body {
 }
 
 /* Apply theme colors */
-.bg-dark-bg { background-color: var(--bg-main) !important; }
-.bg-dark-card { background-color: var(--bg-card) !important; }
-.bg-dark-hover { background-color: var(--bg-hover) !important; }
-.bg-dark-hover:hover { background-color: var(--bg-hover) !important; }
-.border-dark-border { border-color: var(--border-color) !important; }
-.text-white { color: var(--text-primary) !important; }
-.text-gray-300 { color: var(--text-secondary) !important; }
-.text-gray-400 { color: var(--text-muted) !important; }
-.text-gray-500 { color: var(--text-muted) !important; }
-.text-gray-200 { color: var(--text-primary) !important; }
+.bg-dark-bg {
+    background-color: var(--bg-main) !important;
+}
+
+.bg-dark-card {
+    background-color: var(--bg-card) !important;
+}
+
+.bg-dark-hover {
+    background-color: var(--bg-hover) !important;
+}
+
+.bg-dark-hover:hover {
+    background-color: var(--bg-hover) !important;
+}
+
+.border-dark-border {
+    border-color: var(--border-color) !important;
+}
+
+.text-white {
+    color: var(--text-primary) !important;
+}
+
+.text-gray-300 {
+    color: var(--text-secondary) !important;
+}
+
+.text-gray-400 {
+    color: var(--text-muted) !important;
+}
+
+.text-gray-500 {
+    color: var(--text-muted) !important;
+}
+
+.text-gray-200 {
+    color: var(--text-primary) !important;
+}
 
 /* Input styling */
 input {
@@ -249,9 +278,12 @@ body.light-mode #perShareSLDisplay {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: .5;
     }
@@ -265,6 +297,7 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="number"] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .gradient-border {
@@ -284,6 +317,7 @@ input[type="number"] {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -308,6 +342,7 @@ input[type="number"] {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
@@ -403,6 +438,7 @@ body.light-mode .tab-close:hover {
         opacity: 0;
         transform: translateX(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -442,4 +478,18 @@ body.light-mode .tab-close:hover {
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: var(--text-muted);
+}
+
+/* Market prices tooltip styling */
+#marketPricesInfoIcon .absolute {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.light-mode #marketPricesInfoIcon .absolute {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Ensure tooltip is above other elements */
+#marketPricesInfoIcon {
+    z-index: 10;
 }

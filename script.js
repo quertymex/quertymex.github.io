@@ -327,12 +327,12 @@ function switchToPrevTab() {
 }
 
 // Add keyboard event listener for arrow key navigation
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     // Only handle arrow keys when not typing in an input field
     const activeElement = document.activeElement;
     const isInputFocused = activeElement.tagName === 'INPUT' ||
-                          activeElement.tagName === 'TEXTAREA' ||
-                          activeElement.isContentEditable;
+        activeElement.tagName === 'TEXTAREA' ||
+        activeElement.isContentEditable;
 
     // If user is typing, don't intercept arrow keys
     if (isInputFocused) return;
@@ -472,10 +472,10 @@ function updateAutoPriceUI() {
 }
 
 // Listen to stock symbol changes to update tab name
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const stockSymbolInput = document.getElementById('stockSymbol');
     if (stockSymbolInput) {
-        stockSymbolInput.addEventListener('input', function() {
+        stockSymbolInput.addEventListener('input', function () {
             // Save current tab state which will update the tab name
             if (activeTabId) {
                 saveCurrentTabState();
@@ -1071,7 +1071,7 @@ document.getElementById('slPercent').addEventListener('input', autoCalculate);
 
 // Clear error on input
 document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
         const fieldName = this.id;
         const errorElement = document.getElementById(fieldName.replace('Price', '').replace('Percent', '') + 'Error');
         if (errorElement) {
@@ -1140,6 +1140,7 @@ async function fetchStockPrice(symbol) {
         console.log('Using cached price for', upperSymbol, ':', cachedData.price);
         entryPriceInput.value = cachedData.price.toFixed(2);
         updatePriceChangeDisplay(cachedData.percentChange);
+        updateMarketPricesDisplay(cachedData.previousClose, cachedData.openPrice);
         entryPriceInput.dispatchEvent(new Event('input'));
         return;
     }
@@ -1149,9 +1150,11 @@ async function fetchStockPrice(symbol) {
         entryPriceInput.placeholder = 'Fetching price...';
 
         let currentPrice = null;
+        let percentChange = null;
+        let previousClose = null;
+        let openPrice = null;
 
         // Fetch from Finnhub API
-        let percentChange = null;
         try {
             const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10'; // Your API key
             const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${upperSymbol}&token=${finnhubKey}`);
@@ -1161,7 +1164,14 @@ async function fetchStockPrice(symbol) {
                 if (data.c && data.c > 0) {
                     currentPrice = data.c; // Current price
                     percentChange = data.dp; // Percent change
-                    console.log('Fetched from Finnhub:', currentPrice, `(${percentChange}%)`);
+                    previousClose = data.pc; // Previous close
+                    openPrice = data.o; // Open price
+                    console.log('Fetched from Finnhub:', {
+                        current: currentPrice,
+                        change: `${percentChange}%`,
+                        prevClose: previousClose,
+                        open: openPrice
+                    });
                 }
             }
         } catch (e) {
@@ -1169,8 +1179,8 @@ async function fetchStockPrice(symbol) {
         }
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
-            // Cache the price with percent change
-            cachePrice(upperSymbol, currentPrice, percentChange);
+            // Cache the price with all data
+            cachePrice(upperSymbol, currentPrice, percentChange, previousClose, openPrice);
 
             // Update entry price
             entryPriceInput.value = currentPrice.toFixed(2);
@@ -1178,6 +1188,9 @@ async function fetchStockPrice(symbol) {
 
             // Update percent change display
             updatePriceChangeDisplay(percentChange);
+
+            // Update market prices display (previous close & today open)
+            updateMarketPricesDisplay(previousClose, openPrice);
 
             // Trigger auto-calculation
             entryPriceInput.dispatchEvent(new Event('input'));
@@ -1236,6 +1249,78 @@ function updatePriceChangeDisplay(percentChange) {
     }
 }
 
+// Update market prices display (previous close & today open) with percentages
+function updateMarketPricesDisplay(previousClose, openPrice) {
+    const marketPricesInfoIcon = document.getElementById('marketPricesInfoIcon');
+    const prevClosePriceElement = document.getElementById('prevClosePrice');
+    const prevClosePercentElement = document.getElementById('prevClosePercent');
+    const todayOpenPriceElement = document.getElementById('todayOpenPrice');
+    const todayOpenPercentElement = document.getElementById('todayOpenPercent');
+
+    // Get current price for percentage calculations
+    const currentPrice = parseFloat(document.getElementById('entryPrice').value);
+
+    if ((previousClose !== null && !isNaN(previousClose)) || (openPrice !== null && !isNaN(openPrice))) {
+        // Update previous close
+        if (previousClose !== null && !isNaN(previousClose)) {
+            prevClosePriceElement.textContent = `$${previousClose.toFixed(2)}`;
+
+            // Calculate percentage difference from current price
+            if (currentPrice && currentPrice > 0) {
+                const percentDiff = ((currentPrice - previousClose) / previousClose) * 100;
+                const sign = percentDiff >= 0 ? '+' : '';
+                prevClosePercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
+
+                // Color code the percentage
+                if (percentDiff >= 0) {
+                    prevClosePercentElement.className = 'text-xs font-medium text-trading-up';
+                } else {
+                    prevClosePercentElement.className = 'text-xs font-medium text-trading-down';
+                }
+            } else {
+                prevClosePercentElement.textContent = '0.00%';
+                prevClosePercentElement.className = 'text-xs font-medium text-gray-400';
+            }
+        } else {
+            prevClosePriceElement.textContent = 'N/A';
+            prevClosePercentElement.textContent = 'N/A';
+            prevClosePercentElement.className = 'text-xs font-medium text-gray-400';
+        }
+
+        // Update today's open
+        if (openPrice !== null && !isNaN(openPrice)) {
+            todayOpenPriceElement.textContent = `$${openPrice.toFixed(2)}`;
+
+            // Calculate percentage difference from current price
+            if (currentPrice && currentPrice > 0) {
+                const percentDiff = ((currentPrice - openPrice) / openPrice) * 100;
+                const sign = percentDiff >= 0 ? '+' : '';
+                todayOpenPercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
+
+                // Color code the percentage
+                if (percentDiff >= 0) {
+                    todayOpenPercentElement.className = 'text-xs font-medium text-trading-up';
+                } else {
+                    todayOpenPercentElement.className = 'text-xs font-medium text-trading-down';
+                }
+            } else {
+                todayOpenPercentElement.textContent = '0.00%';
+                todayOpenPercentElement.className = 'text-xs font-medium text-gray-400';
+            }
+        } else {
+            todayOpenPriceElement.textContent = 'N/A';
+            todayOpenPercentElement.textContent = 'N/A';
+            todayOpenPercentElement.className = 'text-xs font-medium text-gray-400';
+        }
+
+        // Show the info icon
+        marketPricesInfoIcon.classList.remove('hidden');
+    } else {
+        // Hide the info icon
+        marketPricesInfoIcon.classList.add('hidden');
+    }
+}
+
 // Cache management
 function getCachedPrice(symbol) {
     const cacheKey = `stockPrice_${symbol}`;
@@ -1257,12 +1342,14 @@ function getCachedPrice(symbol) {
     return null;
 }
 
-function cachePrice(symbol, price, percentChange = null) {
+function cachePrice(symbol, price, percentChange = null, previousClose = null, openPrice = null) {
     const cacheKey = `stockPrice_${symbol}`;
     const data = {
         symbol: symbol,
         price: price,
         percentChange: percentChange,
+        previousClose: previousClose,
+        openPrice: openPrice,
         timestamp: Date.now()
     };
 
@@ -1298,6 +1385,8 @@ async function fetchPriceForActiveTab() {
         // Fetch from Finnhub API
         let currentPrice = null;
         let percentChange = null;
+        let previousClose = null;
+        let openPrice = null;
 
         try {
             const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10';
@@ -1308,7 +1397,14 @@ async function fetchPriceForActiveTab() {
                 if (data.c && data.c > 0) {
                     currentPrice = data.c;
                     percentChange = data.dp; // Percent change
-                    console.log(`Fetched ${symbol} from Finnhub:`, currentPrice, `(${percentChange}%)`);
+                    previousClose = data.pc; // Previous close
+                    openPrice = data.o; // Open price
+                    console.log(`Fetched ${symbol} from Finnhub:`, {
+                        current: currentPrice,
+                        change: `${percentChange}%`,
+                        prevClose: previousClose,
+                        open: openPrice
+                    });
                 }
             }
         } catch (e) {
@@ -1316,8 +1412,8 @@ async function fetchPriceForActiveTab() {
         }
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
-            // Cache the new price with percent change
-            cachePrice(symbol, currentPrice, percentChange);
+            // Cache the new price with all data
+            cachePrice(symbol, currentPrice, percentChange, previousClose, openPrice);
 
             // Update the active tab's entry price
             activeTab.entryPrice = currentPrice.toFixed(2);
@@ -1327,6 +1423,9 @@ async function fetchPriceForActiveTab() {
 
             // Update percent change display
             updatePriceChangeDisplay(percentChange);
+
+            // Update market prices display
+            updateMarketPricesDisplay(previousClose, openPrice);
 
             // Trigger auto-calculation
             autoCalculate();
@@ -1394,7 +1493,7 @@ function checkAutoFetchInterval() {
 }
 
 // Listen for stock symbol changes
-document.getElementById('stockSymbol').addEventListener('input', function() {
+document.getElementById('stockSymbol').addEventListener('input', function () {
     const symbol = this.value.trim();
     const entryPriceInput = document.getElementById('entryPrice');
 

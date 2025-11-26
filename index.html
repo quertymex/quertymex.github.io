@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +29,7 @@
     </script>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="bg-dark-bg min-h-screen text-gray-200">
     <!-- Main Container -->
     <div class="container mx-auto px-4 py-6 max-w-7xl">
@@ -35,9 +37,11 @@
         <div class="mb-6">
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-trading-blue to-trading-up rounded-lg flex items-center justify-center">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-trading-blue to-trading-up rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
                     </div>
                     <div>
@@ -46,17 +50,18 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button
-                        id="themeToggle"
-                        onclick="toggleTheme()"
+                    <button id="themeToggle" onclick="toggleTheme()"
                         class="p-2 bg-dark-card border border-dark-border rounded-lg hover:bg-dark-hover transition-all"
-                        title="Toggle theme"
-                    >
-                        <svg id="themeIconDark" class="w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        title="Toggle theme">
+                        <svg id="themeIconDark" class="w-5 h-5 text-gray-400 hover:text-white" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
-                        <svg id="themeIconLight" class="hidden w-5 h-5 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        <svg id="themeIconLight" class="hidden w-5 h-5 text-gray-400 hover:text-white" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                     </button>
                     <div class="hidden md:flex items-center gap-2 text-xs text-gray-400">
@@ -78,7 +83,9 @@
             <div class="bg-dark-card border border-trading-up rounded-lg px-4 py-3 flex items-center gap-3 shadow-xl">
                 <div class="w-5 h-5 bg-trading-up rounded-full flex items-center justify-center">
                     <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd" />
                     </svg>
                 </div>
                 <span class="text-sm font-medium text-white">Copied to clipboard!</span>
@@ -89,30 +96,28 @@
         <div class="mb-4 bg-dark-card rounded-lg border border-dark-border p-2">
             <div class="flex items-center gap-2">
                 <!-- Tabs Container (Scrollable) -->
-                <div class="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-dark-border scrollbar-track-transparent">
+                <div
+                    class="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-dark-border scrollbar-track-transparent">
                     <div class="flex gap-1 min-w-max" id="tabsContainer">
                         <!-- Tabs will be dynamically inserted here -->
                     </div>
                 </div>
 
                 <!-- Clear All Button -->
-                <button
-                    onclick="clearAllTabs()"
+                <button onclick="clearAllTabs()"
                     class="flex-shrink-0 p-2 bg-dark-hover hover:bg-trading-down hover:text-white text-gray-400 rounded-lg transition-all flex items-center gap-1 text-sm font-medium border border-dark-border"
-                    title="Clear all tabs"
-                >
+                    title="Clear all tabs">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                     <span class="hidden sm:inline">Clear</span>
                 </button>
 
                 <!-- Add New Tab Button -->
-                <button
-                    onclick="addNewTab()"
+                <button onclick="addNewTab()"
                     class="flex-shrink-0 p-2 bg-trading-blue hover:bg-opacity-80 text-white rounded-lg transition-all flex items-center gap-1 text-sm font-medium"
-                    title="Add new stock tab"
-                >
+                    title="Add new stock tab">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
@@ -128,7 +133,8 @@
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center gap-2 text-sm text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>US Market (EST):</span>
                     </div>
@@ -146,7 +152,8 @@
                 <div class="flex items-center justify-between mb-1">
                     <div class="flex items-center gap-2 text-sm text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                         </svg>
                         <span>Exchange Rate:</span>
                     </div>
@@ -154,14 +161,12 @@
                         <div class="text-sm font-semibold text-white">
                             1 USD = <span id="exchangeRate" class="text-trading-blue">Loading...</span>
                         </div>
-                        <button
-                            onclick="fetchExchangeRate()"
-                            class="p-1 hover:bg-dark-hover rounded transition-all"
-                            title="Refresh exchange rate"
-                            id="refreshRateBtn"
-                        >
-                            <svg id="refreshIcon" class="w-4 h-4 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        <button onclick="fetchExchangeRate()" class="p-1 hover:bg-dark-hover rounded transition-all"
+                            title="Refresh exchange rate" id="refreshRateBtn">
+                            <svg id="refreshIcon" class="w-4 h-4 text-gray-400 hover:text-white" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
                         </button>
                     </div>
@@ -178,253 +183,280 @@
                 <div id="tradeParamsCard" class="bg-dark-card rounded-lg border border-dark-border p-6">
                     <div class="flex items-center justify-between mb-5">
                         <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-trading-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            <svg class="w-5 h-5 text-trading-blue" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                             </svg>
                             <h2 class="text-lg font-semibold text-white">Trade Parameters</h2>
                         </div>
-                        <button
-                            type="button"
-                            onclick="toggleTradeParams()"
-                            class="lg:hidden p-1 hover:bg-dark-hover rounded transition-all"
-                            id="toggleParamsBtn"
-                        >
-                            <svg id="chevronDown" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        <button type="button" onclick="toggleTradeParams()"
+                            class="lg:hidden p-1 hover:bg-dark-hover rounded transition-all" id="toggleParamsBtn">
+                            <svg id="chevronDown" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
                             </svg>
-                            <svg id="chevronUp" class="hidden w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                            <svg id="chevronUp" class="hidden w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 15l7-7 7 7" />
                             </svg>
                         </button>
                     </div>
 
                     <div id="tradeParamsContent" class="transition-all duration-300 ease-in-out expanded">
-                    <form id="tradeForm" class="space-y-4">
-                        <!-- Stock Symbol -->
-                        <div>
-                            <label for="stockSymbol" class="block text-sm font-medium text-gray-300 mb-2">
-                                Stock Symbol
-                            </label>
-                            <input
-                                type="text"
-                                id="stockSymbol"
-                                placeholder="e.g., AAPL, TSLA, GOOGL"
-                                class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition uppercase"
-                            >
-                        </div>
-
-                        <!-- Calculation Mode Toggle -->
-                        <div class="flex items-center justify-between p-3 bg-dark-hover rounded-lg">
-                            <span class="text-sm font-medium text-gray-300">Calculate From</span>
-                            <div class="flex items-center gap-3">
-                                <button
-                                    type="button"
-                                    onclick="setCalculationMode('current')"
-                                    id="modeCurrentBtn"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all bg-trading-blue text-white"
-                                >
-                                    Current Price
-                                </button>
-                                <button
-                                    type="button"
-                                    onclick="setCalculationMode('target')"
-                                    id="modeTargetBtn"
-                                    class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all bg-dark-card text-gray-400"
-                                >
-                                    Target Price
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Price Fields Grid -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Current Price -->
+                        <form id="tradeForm" class="space-y-4">
+                            <!-- Stock Symbol -->
                             <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <label for="entryPrice" class="text-sm font-medium text-gray-300">Current Price</label>
-                                    <button
-                                        type="button"
-                                        id="autoPriceToggle"
-                                        onclick="toggleAutoPrice()"
-                                        class="flex items-center gap-2 text-xs font-medium px-2 py-1 rounded-lg border transition-all"
-                                        title="Toggle auto-fetch price"
-                                    >
-                                        <div class="relative w-6 h-3 bg-gray-600 rounded-full transition-colors" id="toggleBg">
-                                            <div class="absolute left-0.5 top-0.5 w-2 h-2 bg-white rounded-full transition-transform" id="toggleDot"></div>
-                                        </div>
-                                        <span id="toggleText" class="text-gray-400 text-xs">Auto</span>
+                                <label for="stockSymbol" class="block text-sm font-medium text-gray-300 mb-2">
+                                    Stock Symbol
+                                </label>
+                                <input type="text" id="stockSymbol" placeholder="e.g., AAPL, TSLA, GOOGL"
+                                    class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition uppercase">
+                            </div>
+
+                            <!-- Calculation Mode Toggle -->
+                            <div class="flex items-center justify-between p-3 bg-dark-hover rounded-lg">
+                                <span class="text-sm font-medium text-gray-300">Calculate From</span>
+                                <div class="flex items-center gap-3">
+                                    <button type="button" onclick="setCalculationMode('current')" id="modeCurrentBtn"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all bg-trading-blue text-white">
+                                        Current Price
+                                    </button>
+                                    <button type="button" onclick="setCalculationMode('target')" id="modeTargetBtn"
+                                        class="px-3 py-1.5 text-xs font-medium rounded-lg transition-all bg-dark-card text-gray-400">
+                                        Target Price
                                     </button>
                                 </div>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-400 text-sm">$</span>
-                                    </div>
-                                    <input
-                                        type="number"
-                                        id="entryPrice"
-                                        placeholder="0.00"
-                                        step="0.01"
-                                        min="0"
-                                        class="w-full bg-dark-bg border border-dark-border rounded-lg pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
-                                    >
-                                </div>
-                                <div id="entryError" class="hidden mt-1 text-xs text-trading-down"></div>
-                                <!-- Price Change Display -->
-                                <div class="hidden items-center gap-1 mt-1" id="priceChangeContainer">
-                                    <span class="text-xs text-gray-400">%Chg:</span>
-                                    <span class="text-xs font-semibold" id="priceChangePercent">+0.00%</span>
-                                </div>
                             </div>
 
-                            <!-- Target Price -->
-                            <div>
-                                <div class="flex items-center justify-between mb-2">
-                                    <label for="targetPrice" class="text-sm font-medium text-gray-300">Target Price</label>
-                                    <div style="width: 58px;"></div><!-- Spacer to align with Current Price Auto toggle -->
-                                </div>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <span class="text-gray-400 text-sm">$</span>
+                            <!-- Price Fields Grid -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Current Price -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label for="entryPrice" class="text-sm font-medium text-gray-300">Current
+                                            Price</label>
+                                        <button type="button" id="autoPriceToggle" onclick="toggleAutoPrice()"
+                                            class="flex items-center gap-2 text-xs font-medium px-2 py-1 rounded-lg border transition-all"
+                                            title="Toggle auto-fetch price">
+                                            <div class="relative w-6 h-3 bg-gray-600 rounded-full transition-colors"
+                                                id="toggleBg">
+                                                <div class="absolute left-0.5 top-0.5 w-2 h-2 bg-white rounded-full transition-transform"
+                                                    id="toggleDot"></div>
+                                            </div>
+                                            <span id="toggleText" class="text-gray-400 text-xs">Auto</span>
+                                        </button>
                                     </div>
-                                    <input
-                                        type="number"
-                                        id="targetPrice"
-                                        placeholder="0.00"
-                                        step="0.01"
-                                        min="0"
-                                        class="w-full mt-2.5 bg-dark-bg border border-dark-border rounded-lg pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
-                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-400 text-sm">$</span>
+                                        </div>
+                                        <input type="number" id="entryPrice" placeholder="0.00" step="0.01" min="0"
+                                            class="w-full bg-dark-bg border border-dark-border rounded-lg pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition">
+                                    </div>
+                                    <div id="entryError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                    <!-- Price Change Display with Info Icon -->
+                                    <div class="hidden items-center gap-2 mt-1" id="priceChangeContainer">
+                                        <div class="flex items-center gap-1">
+                                            <span class="text-xs text-gray-400">%Chg:</span>
+                                            <span class="text-xs font-semibold" id="priceChangePercent">+0.00%</span>
+                                        </div>
+                                        <!-- Info Icon with Tooltip -->
+                                        <div class="relative group hidden" id="marketPricesInfoIcon">
+                                            <svg class="w-3.5 h-3.5 text-gray-400 hover:text-trading-blue cursor-help transition-colors"
+                                                fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                            <!-- Tooltip -->
+                                            <div
+                                                class="absolute left-0 bottom-full mb-2 w-56 bg-dark-bg border border-dark-border rounded-lg p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                                <div
+                                                    class="text-xs font-semibold text-white mb-2 border-b border-dark-border pb-1">
+                                                    Market Prices</div>
+                                                <div class="space-y-2">
+                                                    <!-- Previous Close -->
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-xs text-gray-400">Prev Close:</span>
+                                                        <div class="text-right">
+                                                            <div class="text-xs font-semibold text-white"
+                                                                id="prevClosePrice">$0.00</div>
+                                                            <div class="text-xs font-medium" id="prevClosePercent">0.00%
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Today Open -->
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-xs text-gray-400">Today Open:</span>
+                                                        <div class="text-right">
+                                                            <div class="text-xs font-semibold text-white"
+                                                                id="todayOpenPrice">$0.00</div>
+                                                            <div class="text-xs font-medium" id="todayOpenPercent">0.00%
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div id="targetError" class="hidden mt-1 text-xs text-trading-down"></div>
-                                <!-- Percentage Difference Display -->
-                                <div id="priceDifference" class="hidden mt-2 text-xs font-semibold flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path id="arrowIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                    </svg>
-                                    <span id="percentChange">0.00%</span>
-                                    <span id="changeLabel" class="text-gray-400">from target</span>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Quantity -->
-                        <div>
-                            <label for="quantity" class="block text-sm font-medium text-gray-300 mb-2">Quantity (Shares)</label>
-                            <div class="relative">
-                                <input
-                                    type="number"
-                                    id="quantity"
-                                    placeholder="0"
-                                    step="1"
-                                    min="1"
-                                    class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition"
-                                >
-                                <div class="absolute inset-y-0 right-0 flex flex-col border-l border-dark-border">
-                                    <button type="button" onclick="incrementValue('quantity', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
-                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                                <!-- Target Price -->
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label for="targetPrice" class="text-sm font-medium text-gray-300">Target
+                                            Price</label>
+                                        <div style="width: 58px;"></div>
+                                        <!-- Spacer to align with Current Price Auto toggle -->
+                                    </div>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-400 text-sm">$</span>
+                                        </div>
+                                        <input type="number" id="targetPrice" placeholder="0.00" step="0.01" min="0"
+                                            class="w-full mt-2.5 bg-dark-bg border border-dark-border rounded-lg pl-8 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition">
+                                    </div>
+                                    <div id="targetError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                    <!-- Percentage Difference Display -->
+                                    <div id="priceDifference"
+                                        class="hidden mt-2 text-xs font-semibold flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path id="arrowIcon" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                                         </svg>
-                                    </button>
-                                    <button type="button" onclick="decrementValue('quantity', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
-                                        <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="quantityError" class="hidden mt-1 text-xs text-trading-down"></div>
-                        </div>
-
-                        <!-- TP and SL Grid -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <!-- Take Profit -->
-                            <div>
-                                <label for="tpPercent" class="block text-sm font-medium text-gray-300 mb-2">Take Profit</label>
-                                <div class="relative">
-                                    <input
-                                        type="number"
-                                        id="tpPercent"
-                                        placeholder="0"
-                                        step="1"
-                                        min="0"
-                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-up focus:border-transparent transition"
-                                    >
-                                    <div class="absolute inset-y-0 right-0 flex items-center">
-                                        <span class="text-gray-400 text-sm px-2">%</span>
-                                        <div class="flex flex-col border-l border-dark-border h-full">
-                                            <button type="button" onclick="incrementValue('tpPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
-                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                                </svg>
-                                            </button>
-                                            <button type="button" onclick="decrementValue('tpPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
-                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                                        <span id="percentChange">0.00%</span>
+                                        <span id="changeLabel" class="text-gray-400">from target</span>
                                     </div>
                                 </div>
-                                <div id="tpError" class="hidden mt-1 text-xs text-trading-down"></div>
                             </div>
 
-                            <!-- Stop Loss -->
+                            <!-- Quantity -->
                             <div>
-                                <label for="slPercent" class="block text-sm font-medium text-gray-300 mb-2">Stop Loss</label>
+                                <label for="quantity" class="block text-sm font-medium text-gray-300 mb-2">Quantity
+                                    (Shares)</label>
                                 <div class="relative">
-                                    <input
-                                        type="number"
-                                        id="slPercent"
-                                        placeholder="0"
-                                        step="1"
-                                        min="0"
-                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-down focus:border-transparent transition"
-                                    >
-                                    <div class="absolute inset-y-0 right-0 flex items-center">
-                                        <span class="text-gray-400 text-sm px-2">%</span>
-                                        <div class="flex flex-col border-l border-dark-border h-full">
-                                            <button type="button" onclick="incrementValue('slPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
-                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                                                </svg>
-                                            </button>
-                                            <button type="button" onclick="decrementValue('slPercent', 1)" class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
-                                                <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                                    <input type="number" id="quantity" placeholder="0" step="1" min="1"
+                                        class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-blue focus:border-transparent transition">
+                                    <div class="absolute inset-y-0 right-0 flex flex-col border-l border-dark-border">
+                                        <button type="button" onclick="incrementValue('quantity', 1)"
+                                            class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 15l7-7 7 7" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" onclick="decrementValue('quantity', 1)"
+                                            class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                                <div id="slError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                <div id="quantityError" class="hidden mt-1 text-xs text-trading-down"></div>
+                            </div>
+
+                            <!-- TP and SL Grid -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Take Profit -->
+                                <div>
+                                    <label for="tpPercent" class="block text-sm font-medium text-gray-300 mb-2">Take
+                                        Profit</label>
+                                    <div class="relative">
+                                        <input type="number" id="tpPercent" placeholder="0" step="1" min="0"
+                                            class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-up focus:border-transparent transition">
+                                        <div class="absolute inset-y-0 right-0 flex items-center">
+                                            <span class="text-gray-400 text-sm px-2">%</span>
+                                            <div class="flex flex-col border-l border-dark-border h-full">
+                                                <button type="button" onclick="incrementValue('tpPercent', 1)"
+                                                    class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 15l7-7 7 7" />
+                                                    </svg>
+                                                </button>
+                                                <button type="button" onclick="decrementValue('tpPercent', 1)"
+                                                    class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="tpError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                </div>
+
+                                <!-- Stop Loss -->
+                                <div>
+                                    <label for="slPercent" class="block text-sm font-medium text-gray-300 mb-2">Stop
+                                        Loss</label>
+                                    <div class="relative">
+                                        <input type="number" id="slPercent" placeholder="0" step="1" min="0"
+                                            class="w-full bg-dark-bg border border-dark-border rounded-lg px-4 py-3 pr-16 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-trading-down focus:border-transparent transition">
+                                        <div class="absolute inset-y-0 right-0 flex items-center">
+                                            <span class="text-gray-400 text-sm px-2">%</span>
+                                            <div class="flex flex-col border-l border-dark-border h-full">
+                                                <button type="button" onclick="incrementValue('slPercent', 1)"
+                                                    class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-tr-lg">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 15l7-7 7 7" />
+                                                    </svg>
+                                                </button>
+                                                <button type="button" onclick="decrementValue('slPercent', 1)"
+                                                    class="px-2 flex-1 hover:bg-dark-hover transition-colors rounded-br-lg border-t border-dark-border">
+                                                    <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="slError" class="hidden mt-1 text-xs text-trading-down"></div>
+                                </div>
+                            </div>
+
+                            <!-- Reset Button -->
+                            <div class="flex gap-3 pt-2">
+                                <button type="reset" onclick="resetCalculator()"
+                                    class="w-full bg-dark-hover hover:bg-dark-border text-gray-300 font-semibold py-3 rounded-lg transition-all border border-dark-border">
+                                    Reset
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Info Text -->
+                        <div class="mt-4 pt-4 border-t border-dark-border">
+                            <div class="flex items-start gap-3">
+                                <svg class="w-5 h-5 text-trading-blue flex-shrink-0 mt-0.5" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <div>
+                                    <p class="text-sm text-gray-300 leading-relaxed">
+                                        Enter your entry price, quantity, and target percentages. Results will
+                                        auto-calculate and display in both USD and MYR.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- Reset Button -->
-                        <div class="flex gap-3 pt-2">
-                            <button
-                                type="reset"
-                                onclick="resetCalculator()"
-                                class="w-full bg-dark-hover hover:bg-dark-border text-gray-300 font-semibold py-3 rounded-lg transition-all border border-dark-border"
-                            >
-                                Reset
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Info Text -->
-                    <div class="mt-4 pt-4 border-t border-dark-border">
-                        <div class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-trading-blue flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            <div>
-                                <p class="text-sm text-gray-300 leading-relaxed">
-                                    Enter your entry price, quantity, and target percentages. Results will auto-calculate and display in both USD and MYR.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                     </div>
                 </div>
             </div>
@@ -436,28 +468,39 @@
                     <div class="bg-dark-card rounded-lg border border-dark-border p-6">
                         <div class="flex items-center justify-between mb-5">
                             <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-trading-up" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                <svg class="w-5 h-5 text-trading-up" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                 </svg>
                                 <h2 class="text-lg font-semibold text-white">Trade Analysis</h2>
                                 <!-- Order Types Info Icon with Tooltip -->
                                 <div class="relative group">
-                                    <svg class="w-4 h-4 text-gray-400 hover:text-trading-blue cursor-help transition-colors" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    <svg class="w-4 h-4 text-gray-400 hover:text-trading-blue cursor-help transition-colors"
+                                        fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd" />
                                     </svg>
                                     <!-- Tooltip -->
-                                    <div class="absolute left-0 top-6 w-64 bg-dark-bg border border-dark-border rounded-lg p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div
+                                        class="absolute left-0 top-6 w-64 bg-dark-bg border border-dark-border rounded-lg p-3 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                                         <div class="text-xs font-semibold text-white mb-2">Order Types Reference</div>
                                         <div class="space-y-1.5">
-                                            <div class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
+                                            <div
+                                                class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
                                                 <span class="text-xs text-gray-400">Entry:</span>
-                                                <span class="text-xs font-medium text-trading-blue">Set Limit (BUY)</span>
+                                                <span class="text-xs font-medium text-trading-blue">Set Limit
+                                                    (BUY)</span>
                                             </div>
-                                            <div class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
+                                            <div
+                                                class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
                                                 <span class="text-xs text-gray-400">Take Profit:</span>
-                                                <span class="text-xs font-medium text-trading-up">Limit if Touched</span>
+                                                <span class="text-xs font-medium text-trading-up">Limit if
+                                                    Touched</span>
                                             </div>
-                                            <div class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
+                                            <div
+                                                class="flex items-center justify-between py-1.5 px-2 bg-dark-card rounded">
                                                 <span class="text-xs text-gray-400">Stop Loss:</span>
                                                 <span class="text-xs font-medium text-trading-down">Stop Limit</span>
                                             </div>
@@ -465,9 +508,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="exportTradeCard()" class="bg-gradient-to-r from-trading-blue to-trading-up hover:opacity-90 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-all flex items-center gap-2">
+                            <button onclick="exportTradeCard()"
+                                class="bg-gradient-to-r from-trading-blue to-trading-up hover:opacity-90 text-white text-xs font-semibold py-2 px-3 rounded-lg transition-all flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                                 </svg>
                                 Export
                             </button>
@@ -511,13 +556,15 @@
                                 <div class="text-xs text-gray-400 mb-1">MAX PROFIT</div>
                                 <div class="text-xl font-bold text-trading-up" id="maxProfit">+$0.00</div>
                                 <div class="text-xs text-gray-500 mt-1" id="maxProfitMYR">+RM 0.00</div>
-                                <div class="text-xs text-gray-500 mt-2">Per Share: <span id="perShareTPDisplay">+$0.00</span></div>
+                                <div class="text-xs text-gray-500 mt-2">Per Share: <span
+                                        id="perShareTPDisplay">+$0.00</span></div>
                             </div>
                             <div class="bg-dark-bg rounded-lg p-4 border-l-4 border-trading-down">
                                 <div class="text-xs text-gray-400 mb-1">MAX LOSS</div>
                                 <div class="text-xl font-bold text-trading-down" id="maxLoss">-$0.00</div>
                                 <div class="text-xs text-gray-500 mt-1" id="maxLossMYR">-RM 0.00</div>
-                                <div class="text-xs text-gray-500 mt-2">Per Share: <span id="perShareSLDisplay">-$0.00</span></div>
+                                <div class="text-xs text-gray-500 mt-2">Per Share: <span
+                                        id="perShareSLDisplay">-$0.00</span></div>
                             </div>
                         </div>
 
@@ -536,4 +583,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
