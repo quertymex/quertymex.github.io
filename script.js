@@ -37,6 +37,11 @@ function initTabSystem() {
 
     // Immediately fetch prices for all tabs with auto-price enabled on page load
     checkAutoFetchInterval();
+
+    // Clean up any orphaned cache entries
+    setTimeout(() => {
+        cleanupOrphanedCache();
+    }, 1000); // Delay to ensure tabs are fully loaded
 }
 
 // Generate unique tab ID
@@ -172,6 +177,13 @@ function closeTab(event, tabId) {
         if (!confirm(`Close tab "${tab.stockSymbol.toUpperCase()}"?`)) {
             return;
         }
+    }
+
+    // Clean up cached price data for this tab's stock symbol
+    if (tab && tab.stockSymbol) {
+        const cacheKey = `stockPrice_${tab.stockSymbol.toUpperCase()}`;
+        localStorage.removeItem(cacheKey);
+        console.log(`Removed cached price data for ${tab.stockSymbol.toUpperCase()}`);
     }
 
     // Remove tab
@@ -360,6 +372,15 @@ function clearAllTabs() {
     if (!confirm(confirmMessage)) {
         return;
     }
+
+    // Clean up all cached price data for all tabs
+    tabs.forEach(tab => {
+        if (tab.stockSymbol) {
+            const cacheKey = `stockPrice_${tab.stockSymbol.toUpperCase()}`;
+            localStorage.removeItem(cacheKey);
+        }
+    });
+    console.log('Cleared all cached price data');
 
     // Clear all tabs and create a fresh one
     tabs = [];
@@ -1403,6 +1424,40 @@ function cachePrice(symbol, price, percentChange = null, previousClose = null, o
     };
 
     localStorage.setItem(cacheKey, JSON.stringify(data));
+}
+
+// Clean up orphaned cache entries (cache for symbols not in any tab)
+function cleanupOrphanedCache() {
+    // Get all stock symbols currently in tabs
+    const activeSymbols = new Set(
+        tabs
+            .filter(tab => tab.stockSymbol)
+            .map(tab => tab.stockSymbol.toUpperCase())
+    );
+
+    // Find all cached price entries
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('stockPrice_')) {
+            const symbol = key.replace('stockPrice_', '');
+            // If this symbol is not in any active tab, mark for removal
+            if (!activeSymbols.has(symbol)) {
+                keysToRemove.push(key);
+            }
+        }
+    }
+
+    // Remove orphaned entries
+    keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+    });
+
+    if (keysToRemove.length > 0) {
+        console.log(`Cleaned up ${keysToRemove.length} orphaned cache entries:`, keysToRemove);
+    }
+
+    return keysToRemove.length;
 }
 
 // ============================================
