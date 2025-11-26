@@ -1210,7 +1210,7 @@ async function fetchStockPrice(symbol) {
         console.log('Using cached price for', upperSymbol, ':', cachedData.price);
         entryPriceInput.value = cachedData.price.toFixed(2);
         updatePriceChangeDisplay(cachedData.percentChange);
-        updateMarketPricesDisplay(cachedData.previousClose, cachedData.openPrice);
+        updateMarketPricesDisplay(cachedData.previousClose, cachedData.openPrice, cachedData.dayHigh, cachedData.dayLow, cachedData.volume, cachedData.week52High, cachedData.week52Low);
         entryPriceInput.dispatchEvent(new Event('input'));
         return;
     }
@@ -1223,6 +1223,11 @@ async function fetchStockPrice(symbol) {
         let percentChange = null;
         let previousClose = null;
         let openPrice = null;
+        let dayHigh = null;
+        let dayLow = null;
+        let volume = null;
+        let week52High = null;
+        let week52Low = null;
 
         // Fetch from Finnhub API
         try {
@@ -1236,11 +1241,19 @@ async function fetchStockPrice(symbol) {
                     percentChange = data.dp; // Percent change
                     previousClose = data.pc; // Previous close
                     openPrice = data.o; // Open price
+                    dayHigh = data.h; // Day high
+                    dayLow = data.l; // Day low
+                    volume = data.v; // Volume
+                    week52High = data.w52h || null; // 52-week high (if available)
+                    week52Low = data.w52l || null; // 52-week low (if available)
                     console.log('Fetched from Finnhub:', {
                         current: currentPrice,
                         change: `${percentChange}%`,
                         prevClose: previousClose,
-                        open: openPrice
+                        open: openPrice,
+                        high: dayHigh,
+                        low: dayLow,
+                        volume: volume
                     });
                 }
             }
@@ -1250,7 +1263,7 @@ async function fetchStockPrice(symbol) {
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
             // Cache the price with all data
-            cachePrice(upperSymbol, currentPrice, percentChange, previousClose, openPrice);
+            cachePrice(upperSymbol, currentPrice, percentChange, previousClose, openPrice, dayHigh, dayLow, volume, week52High, week52Low);
 
             // Update entry price
             entryPriceInput.value = currentPrice.toFixed(2);
@@ -1259,8 +1272,8 @@ async function fetchStockPrice(symbol) {
             // Update percent change display
             updatePriceChangeDisplay(percentChange);
 
-            // Update market prices display (previous close & today open)
-            updateMarketPricesDisplay(previousClose, openPrice);
+            // Update market prices display with all data
+            updateMarketPricesDisplay(previousClose, openPrice, dayHigh, dayLow, volume, week52High, week52Low);
 
             // Trigger auto-calculation
             entryPriceInput.dispatchEvent(new Event('input'));
@@ -1320,33 +1333,36 @@ function updatePriceChangeDisplay(percentChange) {
 }
 
 // Update market prices display (previous close & today open) with percentages
-function updateMarketPricesDisplay(previousClose, openPrice) {
+function updateMarketPricesDisplay(previousClose, openPrice, dayHigh, dayLow, volume, week52High, week52Low) {
     const marketPricesInfoIcon = document.getElementById('marketPricesInfoIcon');
     const prevClosePriceElement = document.getElementById('prevClosePrice');
     const prevClosePercentElement = document.getElementById('prevClosePercent');
     const todayOpenPriceElement = document.getElementById('todayOpenPrice');
     const todayOpenPercentElement = document.getElementById('todayOpenPercent');
+    const dayHighPriceElement = document.getElementById('dayHighPrice');
+    const dayHighPercentElement = document.getElementById('dayHighPercent');
+    const dayLowPriceElement = document.getElementById('dayLowPrice');
+    const dayLowPercentElement = document.getElementById('dayLowPercent');
+    const volumeDisplayElement = document.getElementById('volumeDisplay');
+    const week52HighElement = document.getElementById('week52High');
+    const week52LowElement = document.getElementById('week52Low');
 
     // Get current price for percentage calculations
     const currentPrice = parseFloat(document.getElementById('entryPrice').value);
 
-    if ((previousClose !== null && !isNaN(previousClose)) || (openPrice !== null && !isNaN(openPrice))) {
+    if ((previousClose !== null && !isNaN(previousClose)) || (openPrice !== null && !isNaN(openPrice)) ||
+        (dayHigh !== null && !isNaN(dayHigh)) || (dayLow !== null && !isNaN(dayLow)) ||
+        (volume !== null && !isNaN(volume)) || (week52High !== null && !isNaN(week52High)) || (week52Low !== null && !isNaN(week52Low))) {
+
         // Update previous close
         if (previousClose !== null && !isNaN(previousClose)) {
             prevClosePriceElement.textContent = `$${previousClose.toFixed(2)}`;
 
-            // Calculate percentage difference from current price
             if (currentPrice && currentPrice > 0) {
                 const percentDiff = ((currentPrice - previousClose) / previousClose) * 100;
                 const sign = percentDiff >= 0 ? '+' : '';
                 prevClosePercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
-
-                // Color code the percentage
-                if (percentDiff >= 0) {
-                    prevClosePercentElement.className = 'text-xs font-medium text-trading-up';
-                } else {
-                    prevClosePercentElement.className = 'text-xs font-medium text-trading-down';
-                }
+                prevClosePercentElement.className = percentDiff >= 0 ? 'text-xs font-medium text-trading-up' : 'text-xs font-medium text-trading-down';
             } else {
                 prevClosePercentElement.textContent = '0.00%';
                 prevClosePercentElement.className = 'text-xs font-medium text-gray-400';
@@ -1361,18 +1377,11 @@ function updateMarketPricesDisplay(previousClose, openPrice) {
         if (openPrice !== null && !isNaN(openPrice)) {
             todayOpenPriceElement.textContent = `$${openPrice.toFixed(2)}`;
 
-            // Calculate percentage difference from current price
             if (currentPrice && currentPrice > 0) {
                 const percentDiff = ((currentPrice - openPrice) / openPrice) * 100;
                 const sign = percentDiff >= 0 ? '+' : '';
                 todayOpenPercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
-
-                // Color code the percentage
-                if (percentDiff >= 0) {
-                    todayOpenPercentElement.className = 'text-xs font-medium text-trading-up';
-                } else {
-                    todayOpenPercentElement.className = 'text-xs font-medium text-trading-down';
-                }
+                todayOpenPercentElement.className = percentDiff >= 0 ? 'text-xs font-medium text-trading-up' : 'text-xs font-medium text-trading-down';
             } else {
                 todayOpenPercentElement.textContent = '0.00%';
                 todayOpenPercentElement.className = 'text-xs font-medium text-gray-400';
@@ -1383,11 +1392,82 @@ function updateMarketPricesDisplay(previousClose, openPrice) {
             todayOpenPercentElement.className = 'text-xs font-medium text-gray-400';
         }
 
+        // Update day high
+        if (dayHigh !== null && !isNaN(dayHigh)) {
+            dayHighPriceElement.textContent = `$${dayHigh.toFixed(2)}`;
+
+            if (currentPrice && currentPrice > 0) {
+                const percentDiff = ((currentPrice - dayHigh) / dayHigh) * 100;
+                const sign = percentDiff >= 0 ? '+' : '';
+                dayHighPercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
+                dayHighPercentElement.className = percentDiff >= 0 ? 'text-xs font-medium text-trading-up' : 'text-xs font-medium text-trading-down';
+            } else {
+                dayHighPercentElement.textContent = '0.00%';
+                dayHighPercentElement.className = 'text-xs font-medium text-gray-400';
+            }
+        } else {
+            dayHighPriceElement.textContent = 'N/A';
+            dayHighPercentElement.textContent = 'N/A';
+            dayHighPercentElement.className = 'text-xs font-medium text-gray-400';
+        }
+
+        // Update day low
+        if (dayLow !== null && !isNaN(dayLow)) {
+            dayLowPriceElement.textContent = `$${dayLow.toFixed(2)}`;
+
+            if (currentPrice && currentPrice > 0) {
+                const percentDiff = ((currentPrice - dayLow) / dayLow) * 100;
+                const sign = percentDiff >= 0 ? '+' : '';
+                dayLowPercentElement.textContent = `${sign}${percentDiff.toFixed(2)}%`;
+                dayLowPercentElement.className = percentDiff >= 0 ? 'text-xs font-medium text-trading-up' : 'text-xs font-medium text-trading-down';
+            } else {
+                dayLowPercentElement.textContent = '0.00%';
+                dayLowPercentElement.className = 'text-xs font-medium text-gray-400';
+            }
+        } else {
+            dayLowPriceElement.textContent = 'N/A';
+            dayLowPercentElement.textContent = 'N/A';
+            dayLowPercentElement.className = 'text-xs font-medium text-gray-400';
+        }
+
+        // Update volume
+        if (volume !== null && !isNaN(volume)) {
+            volumeDisplayElement.textContent = formatVolume(volume);
+        } else {
+            volumeDisplayElement.textContent = 'N/A';
+        }
+
+        // Update 52-week range
+        if (week52High !== null && !isNaN(week52High)) {
+            week52HighElement.textContent = `$${week52High.toFixed(2)}`;
+        } else {
+            week52HighElement.textContent = 'N/A';
+        }
+
+        if (week52Low !== null && !isNaN(week52Low)) {
+            week52LowElement.textContent = `$${week52Low.toFixed(2)}`;
+        } else {
+            week52LowElement.textContent = 'N/A';
+        }
+
         // Show the info icon
         marketPricesInfoIcon.classList.remove('hidden');
     } else {
         // Hide the info icon
         marketPricesInfoIcon.classList.add('hidden');
+    }
+}
+
+// Format volume with M/B notation
+function formatVolume(volume) {
+    if (volume >= 1000000000) {
+        return (volume / 1000000000).toFixed(2) + 'B';
+    } else if (volume >= 1000000) {
+        return (volume / 1000000).toFixed(2) + 'M';
+    } else if (volume >= 1000) {
+        return (volume / 1000).toFixed(2) + 'K';
+    } else {
+        return volume.toString();
     }
 }
 
@@ -1412,7 +1492,7 @@ function getCachedPrice(symbol) {
     return null;
 }
 
-function cachePrice(symbol, price, percentChange = null, previousClose = null, openPrice = null) {
+function cachePrice(symbol, price, percentChange = null, previousClose = null, openPrice = null, dayHigh = null, dayLow = null, volume = null, week52High = null, week52Low = null) {
     const cacheKey = `stockPrice_${symbol}`;
     const data = {
         symbol: symbol,
@@ -1420,6 +1500,11 @@ function cachePrice(symbol, price, percentChange = null, previousClose = null, o
         percentChange: percentChange,
         previousClose: previousClose,
         openPrice: openPrice,
+        dayHigh: dayHigh,
+        dayLow: dayLow,
+        volume: volume,
+        week52High: week52High,
+        week52Low: week52Low,
         timestamp: Date.now()
     };
 
@@ -1491,6 +1576,11 @@ async function fetchPriceForActiveTab() {
         let percentChange = null;
         let previousClose = null;
         let openPrice = null;
+        let dayHigh = null;
+        let dayLow = null;
+        let volume = null;
+        let week52High = null;
+        let week52Low = null;
 
         try {
             const finnhubKey = 'd4eu0qhr01ql649g4o0gd4eu0qhr01ql649g4o10';
@@ -1500,14 +1590,22 @@ async function fetchPriceForActiveTab() {
                 const data = await response.json();
                 if (data.c && data.c > 0) {
                     currentPrice = data.c;
-                    percentChange = data.dp; // Percent change
-                    previousClose = data.pc; // Previous close
-                    openPrice = data.o; // Open price
+                    percentChange = data.dp;
+                    previousClose = data.pc;
+                    openPrice = data.o;
+                    dayHigh = data.h;
+                    dayLow = data.l;
+                    volume = data.v;
+                    week52High = data.w52h || null;
+                    week52Low = data.w52l || null;
                     console.log(`Fetched ${symbol} from Finnhub:`, {
                         current: currentPrice,
                         change: `${percentChange}%`,
                         prevClose: previousClose,
-                        open: openPrice
+                        open: openPrice,
+                        high: dayHigh,
+                        low: dayLow,
+                        volume: volume
                     });
                 }
             }
@@ -1517,7 +1615,7 @@ async function fetchPriceForActiveTab() {
 
         if (currentPrice && !isNaN(currentPrice) && currentPrice > 0) {
             // Cache the new price with all data
-            cachePrice(symbol, currentPrice, percentChange, previousClose, openPrice);
+            cachePrice(symbol, currentPrice, percentChange, previousClose, openPrice, dayHigh, dayLow, volume, week52High, week52Low);
 
             // Update the active tab's entry price
             activeTab.entryPrice = currentPrice.toFixed(2);
@@ -1528,8 +1626,8 @@ async function fetchPriceForActiveTab() {
             // Update percent change display
             updatePriceChangeDisplay(percentChange);
 
-            // Update market prices display
-            updateMarketPricesDisplay(previousClose, openPrice);
+            // Update market prices display with all data
+            updateMarketPricesDisplay(previousClose, openPrice, dayHigh, dayLow, volume, week52High, week52Low);
 
             // Trigger auto-calculation
             autoCalculate();
